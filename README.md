@@ -1,10 +1,10 @@
 <img align="left" alt="Listas Negras IP - hackingyseguridad.com" src="https://github.com/hackingyseguridad/listanegra/blob/main/blacklist.png" style="margin-bottom: 20px;">
 
-### Listanegra
+## Listanegra
 
+### BlackList IP:
 
-
-listas de IP que son herramientas técnicas , para filtrar y evitar IP o dominios utilizados para: 
+listas negras de IP / Blacklist IP,  son herramientas técnicas , para filtrar y evitar IP o dominios utilizados para: 
 
 1º.- Spam de correo electronico, Phissing email, SCAM. Spam distribuido en múltiples IPs. Spam support services. Servidores de bulletproof hosting. Spambots	Equipos enviando spam localmente
 
@@ -15,6 +15,18 @@ listas de IP que son herramientas técnicas , para filtrar y evitar IP o dominio
 4º.- Botnet C&C. Servidores de control de botnets. Botnet zombies	Equipos parte de botnets.
 
 5º.- Proxy abiertos	Proxies HTTP/SOCKS comprometidos.
+
+###  Impacto:
+
+estar listado en Blacklist lista negra podría tener alguna consecuencia por bloqueos y reputación en listas 
+usadas por algunos firewall y tecnologías de seguridad:
+
+1. correo-email: Los servidores de destino rechazarán automáticamente emails o los enviarán directo a la carpeta de spam.
+
+2. La IP o el rango, aparecemos como no confiables, ante los proveedores de servicios de internet (ISPs).
+
+3. Bloqueos/filtros: en algunos casos, se puede bloquear el acceso a servicios en la nube que validan la seguridad de la IP, si estas aparecen listadas.
+
 
 ### Consulta manual IP o dominio en lista negra ( blacklist )
 
