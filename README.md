@@ -4,7 +4,7 @@
 
 ### BlackList IP:
 
-listas negras de IP / Blacklist IP,  son herramientas técnicas , para filtrar y evitar IP o dominios utilizados para: 
+listas negras de IP / Blacklist IP,  son herramientas técnicas  para filtrar y evitar IP o dominios utilizados para: 
 
 1º.- Spam de correo electronico, Phissing email, SCAM. Spam distribuido en múltiples IPs. Spam support services. Servidores de bulletproof hosting. Spambots	Equipos enviando spam localmente
 
