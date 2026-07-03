@@ -27,6 +27,19 @@ usadas por algunos firewall y tecnologías de seguridad:
 
 3. Bloqueos/filtros: en algunos casos, se puede bloquear el acceso a servicios en la nube que validan la seguridad de la IP, si estas aparecen listadas.
 
+Por ejemplo :
+
+1. **zen.spamhaus.org** Es la principal fuente de reputación para Microsoft (Outlook/Hotmail), Google (Gmail), y miles de empresas.
+
+2. **bl.spamcop.net** SpamCop es una de las bases de datos de spam más respetadas. 
+
+3. **dnsbl.sorbs.net** y dnsbl-1.uceprotect.net Son listas muy estrictas. Muchos servidores de correo las 
+usan para puntuar negativamente el correo entrante (lo que hace que tus emails vayan a la carpeta 
+de SPAM).
+
+4. **barracudacentral.org** Es el sistema de reputación de Barracuda Networks, uno de los firewalls de 
+email más vendidos del mundo.
+
 
 ### Consulta manual IP o dominio en lista negra ( blacklist )
 
