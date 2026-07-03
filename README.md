@@ -16,7 +16,7 @@ listas negras de IP / Blacklist IP,  son herramientas técnicas  para filtrar y 
 
 5º.- Proxy abiertos	Proxies HTTP/SOCKS comprometidos.
 
-###  Impacto:
+###  Impacto IP listada:
 
 estar listado en Blacklist lista negra podría tener alguna consecuencia por bloqueos y reputación en listas 
 usadas por algunos firewall y tecnologías de seguridad:
