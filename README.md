@@ -40,6 +40,13 @@ de SPAM).
 **barracudacentral.org** Es el sistema de reputación de Barracuda Networks, uno de los firewalls de 
 email más vendidos del mundo.
 
+### El umbral crítico: 20 % de IP Listadas de un AS (BGP)
+
+Las listas negras más estrictas a nivel de red (como UCEPROTECT Nivel 3 o los sistemas de reputación de Spamhaus) automatizan el bloqueo de un AS completo bajo estas condiciones:
+
+**20% de sus IPs activas listadas:** Si una de cada cinco IPs de un proveedor está listada, los filtros consideran que el AS está ***"fuera de control"***.
+
+Aparecer en el Top de los Peores (Top 10 Worst ASNs): Organizaciones como Spamhaus publican diariamente una lista de los  **10 AS Sistemas Autónomos** con peor comportamiento del mundo. Si un ISP entra ahí, cientos de miles de servidores de correo en todo el planeta activan automáticamente una regla de bloqueo preventivo de todo su rango.
 
 ### Consulta manual IP o dominio en lista negra ( blacklist )
 
