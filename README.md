@@ -21,13 +21,13 @@ listas negras de IP / Blacklist IP,  son herramientas técnicas , para filtrar y
 estar listado en Blacklist lista negra podría tener alguna consecuencia por bloqueos y reputación en listas 
 usadas por algunos firewall y tecnologías de seguridad:
 
-1. correo-email: Los servidores de destino rechazarán automáticamente emails o los enviarán directo a la carpeta de spam.
+1º.- correo-email: Los servidores de destino rechazarán automáticamente emails o los enviarán directo a la carpeta de spam.
 
-2. La IP o el rango, aparecemos como no confiables, ante los proveedores de servicios de internet (ISPs).
+2º.- La IP o el rango, aparecemos como no confiables, ante los proveedores de servicios de internet (ISPs).
 
-3. Bloqueos/filtros: en algunos casos, se puede bloquear el acceso a servicios en la nube que validan la seguridad de la IP, si estas aparecen listadas.
+3º.-. Bloqueos/filtros: en algunos casos, se puede bloquear el acceso a servicios en la nube que validan la seguridad de la IP, si estas aparecen listadas.
 
-Por ejemplo :
+por ejemplo :
 
 **zen.spamhaus.org** Es la principal fuente de reputación para Microsoft (Outlook/Hotmail), Google (Gmail), y miles de empresas.
 
