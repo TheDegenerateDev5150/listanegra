@@ -62,8 +62,6 @@ https://check.spamhaus.org/query/ip/<IP>
 
 <img align="left" alt="Listas Negras IP https://check.spamhaus.org/query/ip/" src="https://github.com/hackingyseguridad/listanegra/blob/main/spamhaus.png" style="margin-bottom: 20px;">
 
-https://www.spamhaus.org/xbl/
-
 https://www.abuseat.org/
 
 https://www.abuseipdb.com/
@@ -77,8 +75,6 @@ https://whatismyipaddress.com/blacklist-check
 https://blacklistalert.org/
 
 https://www.dnsbl.info/
-
-https://check.spamhaus.org/query/ip/$IP
 
 https://mxtoolbox.com/
 
