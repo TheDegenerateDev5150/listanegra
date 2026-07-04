@@ -1,7 +1,5 @@
 
-#  Tabla Resumen de Listas Negras (RBLs) por Tipo de Amenaza
-
-Esta tabla clasifica todas las listas negras del repositorio `listanegra` según su propósito principal, para que puedas seleccionar las más adecuadas para tu filtrado de correo o seguridad de red.
+###  Listas (RBLs) por tipo 
 
 | Lista | Tipo de Amenaza | Descripción |
 |-------|-----------------|-------------|
