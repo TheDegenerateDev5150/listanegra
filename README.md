@@ -25,9 +25,7 @@ usadas por algunos firewall y tecnologías de seguridad:
 
 2º.- La IP o el rango, aparecemos como no confiables, ante los proveedores de servicios de internet (ISPs).
 
-3º.-. Bloqueos/filtros: en algunos casos, se puede bloquear el acceso a servicios en la nube que validan la seguridad de la IP, si estas aparecen listadas.
-
-algunas listas negras, especialmente las más agresivas, pueden optar por listar rangos CIDR (por ejemplo, 192.0.2.0/24) si consideran que toda una red es problemática 
+3º.-. Bloqueos/filtros: en algunos casos, se puede bloquear el acceso a servicios en la nube que validan la seguridad de la IP, si estas aparecen listadas; algunas listas negras, especialmente las más agresivas, pueden optar por listar rangos CIDR (por ejemplo, 192.0.2.0/24) si consideran que toda una red es problemática 
 
 por ejemplo :
 
