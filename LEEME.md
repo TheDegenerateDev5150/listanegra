@@ -1,80 +1,114 @@
-<img align="left" alt="Listas Negras IP" src="https://github.com/hackingyseguridad/listanegra/blob/main/blacklist.png" width="120" style="margin-right: 20px; margin-bottom: 20px;">
 
-# Listanegra
+<img align="left" alt="Listas Negras IP - hackingyseguridad.com" src="https://github.com/hackingyseguridad/listanegra/blob/main/blacklist.png" style="margin-bottom: 20px;">
 
-**Repositorio de Listas Negras (Blacklists) de IPs y dominios maliciosos.**
+## Listanegra
 
-Herramientas técnicas para filtrar y bloquear direcciones IP y dominios utilizados en actividades maliciosas.
+### BlackList IP:
 
-### ¿Para qué sirven estas listas?
+listas negras de IP / Blacklist IP,  son herramientas técnicas  para filtrar y evitar IP o dominios utilizados para: 
 
-Las listas negras permiten detectar y bloquear:
+1º.- Spam de correo electronico, Phissing email, SCAM. Spam distribuido en múltiples IPs. Spam support services. Servidores de bulletproof hosting. Spambots	Equipos enviando spam localmente
 
-1. **Spam y Phishing**
-   - Envío masivo de correo no deseado
-   - Campañas de phishing y scams
-   - Servidores de *bulletproof hosting*
-   - Spambots
+2º.- Phishing sites. Sitios de suplantación de identidad. 
 
-2. **Sitios de Phishing**
-   - Páginas falsas de suplantación de identidad
+3º.- Malware distribution. Sitios que distribuyen malware. IPs infectadas	PCs/equipos con malware
 
-3. **Distribución de Malware**
-   - Sitios que hospedan malware
-   - Equipos infectados (bots, troyanos, etc.)
+4º.- Botnet C&C. Servidores de control de botnets. Botnet zombies	Equipos parte de botnets.
 
-4. **Botnets**
-   - Servidores de comando y control (C&C)
-   - Zombies infectados
+5º.- Proxy abiertos	Proxies HTTP/SOCKS comprometidos.
 
-5. **Proxies Abiertos**
-   - Proxies HTTP/SOCKS comprometidos o abusados
+###  Impacto IP listada:
 
----
+estar listado en Blacklist lista negra podría tener alguna consecuencia por bloqueos y reputación en listas 
+usadas por algunos firewall y tecnologías de seguridad:
 
-## Impacto de estar en una lista negra
+1º.- correo-email: Los servidores de destino rechazarán automáticamente emails o los enviarán directo a la carpeta de spam.
 
-Aparecer en una blacklist puede tener consecuencias graves:
+2º.- La IP o el rango, aparecemos como no confiables, ante los proveedores de servicios de internet (ISPs).
 
-- **Correo electrónico**: Tus emails son rechazados o enviados directamente a spam.
-- **Reputación**: Proveedores de internet (ISPs) y servicios en la nube te consideran no confiable.
-- **Bloqueos**: Restricciones en servicios de hosting, VPS, email marketing, etc.
+3º.-. Bloqueos/filtros: en algunos casos, se puede bloquear el acceso a servicios en la nube que validan la seguridad de la IP, si estas aparecen listadas; algunas listas negras, especialmente las más agresivas, pueden optar por listar rangos CIDR (por ejemplo, 192.0.2.0/24) si consideran que toda una red es problemática 
 
-### Listas negras más importantes
+por ejemplo :
 
-- **zen.spamhaus.org** — La más usada por Microsoft, Google y miles de empresas.
-- **bl.spamcop.net** — Muy respetada en la comunidad anti-spam.
-- **dnsbl.sorbs.net** y **dnsbl-1.uceprotect.net** — Listas muy estrictas.
-- **barracudacentral.org** — Usada por firewalls de email Barracuda.
+**zen.spamhaus.org** (ZEN): Lista combinada que reúne la SBL, XBL y PBL en una sola consulta.  Es la principal fuente de reputación para Microsoft (Outlook/Hotmail), Google (Gmail), y miles de empresas.
 
----
+(SBL) Spamhaus Blocklist: lista de IP de spam o que albergan contenido malicioso. Incluye tanto IP individuales como rangos completos
 
-## Umbral Crítico: 20% de IPs Listadas en un AS
+(XBL) Exploits Blocklist: Lista IP de equipos que han sido comprometidos y se utilizan para enviar spam o malware. 
 
-Las listas más estrictas (como UCEPROTECT Level 3 o Spamhaus) pueden **bloquear todo un proveedor** si:
+(PBL) Policy Blocklist : lista de IP que no deberían enviar correo directamente a un servidor de correo.
 
-> **20% o más de sus IPs activas** aparecen en listas negras.
+(CSS): Combined Spam Sources: lista IP que envían correo de baja reputación, sin verificaciones SPF, DKIM, DMARK
 
-En ese caso, el Sistema Autónomo (AS) se considera **"fuera de control"**.
+**bl.spamcop.net** SpamCop es una de las bases de datos de spam más respetadas. 
 
-Spamhaus publica diariamente el **Top 10 Worst ASNs** (los peores proveedores del mundo). Estar en esa lista provoca bloqueos masivos a nivel global.
+**dnsbl.sorbs.net** y dnsbl-1.uceprotect.net Son listas muy estrictas. Muchos servidores de correo las 
+usan para puntuar negativamente el correo entrante (lo que hace que tus emails vayan a la carpeta 
+de SPAM).
 
----
+**barracudacentral.org** Es el sistema de reputación de Barracuda Networks, uno de los firewalls de 
+email más vendidos del mundo.
 
-## Cómo consultar si una IP o dominio está en lista negra
+### El umbral crítico: 20 % de IP Listadas de un AS (BGP sistema autonomo)
 
-- [WhatIsMyIPAddress Blacklist Check](https://whatismyipaddress.com/blacklist-check)
-- [BlacklistAlert.org](https://blacklistalert.org/)
-- [DNSBL.info](https://www.dnsbl.info/)
-- [Spamhaus Check](https://check.spamhaus.org/)
-- [MXToolbox](https://mxtoolbox.com/)
-- [MultiRBL](https://multirbl.valli.org/)
+Las listas negras más estrictas a nivel de red (como UCEPROTECT Nivel 3 o los sistemas de reputación de Spamhaus) automatizan el bloqueo de un AS completo bajo estas condiciones:
 
----
+**20% de sus IPs activas listadas:** Si una de cada cinco IPs de un proveedor está listada, los filtros consideran que el AS está ***"fuera de control"***.
 
-## Uso del repositorio
+Aparecer en el Top de los Peores (Top 10 Worst ASNs): Organizaciones como Spamhaus publican diariamente una lista de los  **10 AS Sistemas Autónomos** con peor comportamiento del mundo. Si un ISP entra ahí, cientos de miles de servidores de correo en todo el planeta activan automáticamente una regla de bloqueo preventivo de todo su rango.
+
+### Consulta manual IP o dominio en lista negra ( blacklist )
+
+https://check.spamhaus.org/query/ip/<IP>
+
+<img align="left" alt="Listas Negras IP https://check.spamhaus.org/query/ip/" src="https://github.com/hackingyseguridad/listanegra/blob/main/spamhaus.png" style="margin-bottom: 20px;">
+
+https://www.spamhaus.org/xbl/
+
+https://www.abuseat.org/
+
+https://www.abuseipdb.com/
+
+https://otx.alienvault.com/
+
+https://www.shodan.io/
+
+https://whatismyipaddress.com/blacklist-check
+
+https://blacklistalert.org/
+
+https://www.dnsbl.info/
+
+https://check.spamhaus.org/query/ip/$IP
+
+https://mxtoolbox.com/
+
+https://multirbl.valli.org/lookup/$IP.html
+
+## Instalar Git
 
 ```bash
 git clone https://github.com/hackingyseguridad/listanegra.git
 cd listanegra
 chmod +x *.sh
+```
+
+### Consulta IPs en listas negras, blacklist IP
+
+./listanegra.sh     consulta mi IP actual
+
+./listanegra2.sh    consulta IPv4 o IPv6
+
+./checkip.sh        consulta una IP
+
+./check2.sh         consulta desde fichero  ip.txt
+
+
+#
+
+http://www.hackingyseguridad.com/
+
+#
+
+
+
