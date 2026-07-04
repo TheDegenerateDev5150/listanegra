@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================================
-# consulta_blacklist.sh v1.0.0
+# consulta.sh v1.0.0
 # Script de consulta de IPs en listas negras (BlackList) a partir de
 # ip.txt
 #
@@ -8,7 +8,8 @@
 #   ./consulta_blacklist.sh <IP1> [IP2] [IP3] ...
 #   ./consulta_blacklist.sh -f <fichero_con_ips>
 #   cat lista_ips.txt | ./consulta_blacklist.sh -
-#
+# 
+# usa consultas del tipo dig +short 99.255.41.81.spamhaus.org
 # Autor: hackingyseguridad.com
 # ============================================================================
 
