@@ -12,10 +12,9 @@
 # Autor: hackingyseguridad.com
 # ============================================================================
 
-set -u
-
 VERSION="1.0.0"
 FUENTE="todas.txt"
+FICHERO_RESULTADO="resultado.txt"
 
 # --- Colores (si la salida es una TTY) --------------------------------------
 if [ -t 1 ]; then
@@ -53,115 +52,168 @@ EOF
   exit 0
 }
 
+# Función para escribir en pantalla y en fichero
+escribir() {
+  echo "$1"
+  echo "$1" >> "$FICHERO_RESULTADO"
+}
+
+# Función para escribir solo en fichero (sin colores)
+escribir_sin_color() {
+  echo "$1" >> "$FICHERO_RESULTADO"
+}
+
 validar_ip() {
-  local ip="$1"
-  if [[ "$ip" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
-    local o1 o2 o3 o4
-    IFS='.' read -r o1 o2 o3 o4 <<< "$ip"
-    if (( o1 <= 255 && o2 <= 255 && o3 <= 255 && o4 <= 255 )); then
-      return 0
-    fi
+  ip="$1"
+  case "$ip" in
+    *[!0-9.]*)
+      return 1
+      ;;
+  esac
+  
+  o1=$(echo "$ip" | cut -d. -f1)
+  o2=$(echo "$ip" | cut -d. -f2)
+  o3=$(echo "$ip" | cut -d. -f3)
+  o4=$(echo "$ip" | cut -d. -f4)
+  
+  if [ -z "$o1" ] || [ -z "$o2" ] || [ -z "$o3" ] || [ -z "$o4" ]; then
+    return 1
+  fi
+  
+  if [ "$o1" -le 255 ] && [ "$o2" -le 255 ] && [ "$o3" -le 255 ] && [ "$o4" -le 255 ]; then
+    return 0
   fi
   return 1
 }
 
+# --- Limpiar resultado anterior ---------------------------------------------
+> "$FICHERO_RESULTADO"
+
 # --- Comprobaciones ---------------------------------------------------------
 if [ ! -r "$FUENTE" ]; then
-  echo -e "${C_RED}[ERROR]${C_RST} No se puede leer el fichero fuente: $FUENTE" >&2
+  echo "[ERROR] No se puede leer el fichero fuente: $FUENTE" >&2
   exit 2
 fi
 
 if [ $# -eq 0 ]; then uso; fi
 
 # --- Recogida de IPs a consultar -------------------------------------------
-LISTA_IPS=()
-case "${1:-}" in
+LISTA_IPS=""
+case "$1" in
   -h|--help) uso ;;
   -V|--version) echo "consulta_blacklist.sh v${VERSION}"; exit 0 ;;
   -f)
     shift
-    FICHERO="${1:-}"
+    FICHERO="$1"
     if [ -z "$FICHERO" ] || [ ! -r "$FICHERO" ]; then
-      echo -e "${C_RED}[ERROR]${C_RST} Fichero inválido o no legible: $FICHERO" >&2
+      echo "[ERROR] Fichero inválido o no legible: $FICHERO" >&2
       exit 2
     fi
-    while IFS= read -r linea; do
+    while read -r linea; do
       ip=$(echo "$linea" | awk '{print $1}')
-      [ -n "$ip" ] && LISTA_IPS+=("$ip")
+      if [ -n "$ip" ]; then
+        if [ -n "$LISTA_IPS" ]; then
+          LISTA_IPS="$LISTA_IPS $ip"
+        else
+          LISTA_IPS="$ip"
+        fi
+      fi
     done < "$FICHERO"
     ;;
   -)
-    while IFS= read -r linea; do
+    while read -r linea; do
       ip=$(echo "$linea" | awk '{print $1}')
-      [ -n "$ip" ] && LISTA_IPS+=("$ip")
+      if [ -n "$ip" ]; then
+        if [ -n "$LISTA_IPS" ]; then
+          LISTA_IPS="$LISTA_IPS $ip"
+        else
+          LISTA_IPS="$ip"
+        fi
+      fi
     done
     ;;
   *)
     for arg in "$@"; do
       ip=$(echo "$arg" | awk '{print $1}')
-      [ -n "$ip" ] && LISTA_IPS+=("$ip")
+      if [ -n "$ip" ]; then
+        if [ -n "$LISTA_IPS" ]; then
+          LISTA_IPS="$LISTA_IPS $ip"
+        else
+          LISTA_IPS="$ip"
+        fi
+      fi
     done
     ;;
 esac
 
-if [ ${#LISTA_IPS[@]} -eq 0 ]; then
-  echo -e "${C_YEL}[AVISO]${C_RST} No se proporcionaron IPs para consultar." >&2
+if [ -z "$LISTA_IPS" ]; then
+  echo "[AVISO] No se proporcionaron IPs para consultar." >&2
   exit 1
 fi
 
-# --- Construcción del patrón para grep -------------------------------------
-# Escapa los puntos para que grep los interprete como literales
-PATRON=""
-for ip in "${LISTA_IPS[@]}"; do
-  esc=$(printf '%s' "$ip" | sed 's/\./\\./g')
-  if [ -z "$PATRON" ]; then
-    PATRON="^${esc}[[:space:]]"
-  else
-    PATRON="${PATRON}|^${esc}[[:space:]]"
-  fi
-done
-
 # --- Cabecera ---------------------------------------------------------------
-printf "${C_CYN}=== Consulta de IPs en BlackList ===${C_RST}\n"
-printf "Fichero fuente : %s\n" "$FUENTE"
-printf "IPs consultadas: %d\n\n" "${#LISTA_IPS[@]}"
+escribir "=== Consulta de IPs en BlackList ==="
+escribir "Fichero fuente : $FUENTE"
+escribir "Resultado guardado en: $FICHERO_RESULTADO"
+escribir ""
 
 # --- Bucle principal: consulta cada IP --------------------------------------
 ENCONTRADAS=0
 NO_ENCONTRADAS=0
-declare -A RESULTADOS
+TOTAL_IPS=0
 
-for ip in "${LISTA_IPS[@]}"; do
+# Contar IPs
+for ip in $LISTA_IPS; do
+  TOTAL_IPS=$((TOTAL_IPS + 1))
+done
+
+for ip in $LISTA_IPS; do
   if ! validar_ip "$ip"; then
-    printf "${C_YEL}[INVÁLIDA]${C_RST}  %-18s  →  Formato no válido\n" "$ip"
+    mensaje="${C_YEL}[INVÁLIDA]${C_RST}  $ip  →  Formato no válido"
+    mensaje_sin_color="[INVÁLIDA]  $ip  →  Formato no válido"
+    escribir "$mensaje"
+    escribir_sin_color "$mensaje_sin_color"
     continue
   fi
 
   # Busca la IP como inicio de línea seguida de espacio
-  match=$(grep -E "^${ip//./\\.}[[:space:]]" "$FUENTE" 2>/dev/null)
+  ip_escaped=$(echo "$ip" | sed 's/\./\\./g')
+  match=$(grep -E "^${ip_escaped}[[:space:]]" "$FUENTE" 2>/dev/null)
 
   if [ -n "$match" ]; then
-    # Extrae los descriptores únicos (columna 3 en adelante, separados por #)
+    # Extrae los descriptores únicos
     listas=$(echo "$match" | awk -F'#' '{print $2}' | awk '{print $1}' | sort -u | paste -sd',' -)
     num_listas=$(echo "$match" | awk -F'#' '{print $2}' | awk '{print $1}' | sort -u | wc -l)
-    printf "${C_RED}[LISTADA]${C_RST}   %-18s  →  %d lista(s): %s\n" "$ip" "$num_listas" "$listas"
+    
+    mensaje="${C_RED}[LISTADA]${C_RST}   $ip  →  $num_listas lista(s): $listas"
+    mensaje_sin_color="[LISTADA]   $ip  →  $num_listas lista(s): $listas"
+    
+    escribir "$mensaje"
+    escribir_sin_color "$mensaje_sin_color"
+    
     ENCONTRADAS=$((ENCONTRADAS + 1))
   else
-    printf "${C_GRN}[LIMPIA]${C_RST}    %-18s  →  No aparece en ninguna lista\n" "$ip"
+    mensaje="${C_GRN}[LIMPIA]${C_RST}    $ip  →  No aparece en ninguna lista"
+    mensaje_sin_color="[LIMPIA]    $ip  →  No aparece en ninguna lista"
+    
+    escribir "$mensaje"
+    escribir_sin_color "$mensaje_sin_color"
+    
     NO_ENCONTRADAS=$((NO_ENCONTRADAS + 1))
   fi
 done
 
 # --- Resumen final ----------------------------------------------------------
 echo
-printf "${C_CYN}=== Resumen ===${C_RST}\n"
-printf "IPs listadas en BlackList : ${C_RED}%d${C_RST}\n" "$ENCONTRADAS"
-printf "IPs limpias / no listadas : ${C_GRN}%d${C_RST}\n" "$NO_ENCONTRADAS"
-printf "Total consultadas         : %d\n" "${#LISTA_IPS[@]}"
+escribir "=== Resumen ==="
+escribir "IPs listadas en BlackList : $ENCONTRADAS"
+escribir "IPs limpias / no listadas : $NO_ENCONTRADAS"
+escribir "Total consultadas         : $TOTAL_IPS"
+escribir ""
+escribir "Resultados guardados en: $FICHERO_RESULTADO"
 
 # Código de salida: 0 si todas limpias, 1 si alguna está listada
 if [ "$ENCONTRADAS" -gt 0 ]; then
   exit 1
 fi
 exit 0
-
