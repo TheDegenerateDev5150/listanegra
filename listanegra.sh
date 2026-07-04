@@ -1,5 +1,5 @@
 #!/bin/bash
-# check_multi_rbl_ip.sh — Adaptado para Bash 1.0.x
+# listanegra.sh — Adaptado para Bash 1.0.x
 # Consulta TODAS las listas en 'listas.txt' para una IP dada como argumento
 # Uso: sh check_multi_rbl_ip.sh IP
 # Ejemplo: sh check_multi_rbl_ip.sh 8.8.8.8
