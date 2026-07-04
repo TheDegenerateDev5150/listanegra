@@ -52,7 +52,7 @@ Aparecer en el Top de los Peores (Top 10 Worst ASNs): Organizaciones como Spamha
 
 https://check.spamhaus.org/query/ip/<IP>
 
-<img align="left" alt="Listas Negras IP https://check.spamhaus.org/query/ip/<IP>" src="https://github.com/hackingyseguridad/listanegra/blob/main/spamhaus.png" style="margin-bottom: 20px;">
+<img align="left" alt="Listas Negras IP https://check.spamhaus.org/query/ip/" src="https://github.com/hackingyseguridad/listanegra/blob/main/spamhaus.png" style="margin-bottom: 20px;">
 
 https://www.spamhaus.org/xbl/
 
