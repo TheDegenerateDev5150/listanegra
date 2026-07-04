@@ -1,10 +1,11 @@
+
 <img align="left" alt="Listas Negras IP - hackingyseguridad.com" src="https://github.com/hackingyseguridad/listanegra/blob/main/blacklist.png" style="margin-bottom: 20px;">
 
 ## Listanegra
 
 ### BlackList IP:
 
-listas negras de IP / Blacklist IP,  son herramientas técnicas  para filtrar y evitar IP o dominios utilizados para: 
+[listas negras](LISTAS.md) de IP / Blacklist IP,  son herramientas técnicas  para filtrar y evitar IP o dominios utilizados para: 
 
 1º.- Spam de correo electronico, Phissing email, SCAM. Spam distribuido en múltiples IPs. Spam support services. Servidores de bulletproof hosting. Spambots	Equipos enviando spam localmente
 
@@ -62,8 +63,6 @@ https://check.spamhaus.org/query/ip/<IP>
 
 <img align="left" alt="Listas Negras IP https://check.spamhaus.org/query/ip/" src="https://github.com/hackingyseguridad/listanegra/blob/main/spamhaus.png" style="margin-bottom: 20px;">
 
-https://www.spamhaus.org/xbl/
-
 https://www.abuseat.org/
 
 https://www.abuseipdb.com/
@@ -77,8 +76,6 @@ https://whatismyipaddress.com/blacklist-check
 https://blacklistalert.org/
 
 https://www.dnsbl.info/
-
-https://check.spamhaus.org/query/ip/$IP
 
 https://mxtoolbox.com/
 
@@ -178,8 +175,5 @@ chmod +x *.sh
 http://www.hackingyseguridad.com/
 
 #
-
-
-
 
 
