@@ -1,182 +1,224 @@
-#!/bin/sh
+#!/bin/bash
+# check_multi_rbl_ip.sh — Adaptado para Bash 1.0.x
+# Consulta TODAS las listas en 'listas.txt' para una IP dada como argumento
+# Uso: sh check_multi_rbl_ip.sh IP
+# Ejemplo: sh check_multi_rbl_ip.sh 8.8.8.8
 
-# Script simple para verificar IP publica listada  en Spamhaus"
-# Verifica si una IP esta en Lista Negra, por SAPM de email
-# Las IPv4 suelen ser listadas tras el primer envio SPAM
-# Las IPv6 raramente son las litadas en BlackList
-# (R) hackingyseguridad.com 2026
-# @antonio_taboada
+# Variables
+INPUT_DNS="dns.txt"
+INPUT_LISTAS="listas.txt"
+OUTPUT_FILE="resultado.txt"
+CACHE_FILE="/tmp/cache_multi_rbl_ip.txt"
 
+# Contadores
+TOTAL_LISTAS=0
+LISTADAS=0
+LIMPIAS=0
+ERRORES=0
+TOTAL_DNS=0
 
-#!/usr/bin/env bash
+# Verificar que se pasó un argumento (la IP)
+if [ $# -ne 1 ]; then
+  echo "ERROR: Debes especificar una IP"
+  echo "Uso: sh $0 IP"
+  echo "Ejemplo: sh $0 8.8.8.8"
+  exit 1
+fi
 
-#
-# ipcheck.sh
-#
-# Analiza una dirección IP pública
-#
-# Funciones:
-#   - Whois
-#   - PTR
-#   - Geolocalización
-#   - Shodan InternetDB
-#   - Nmap
-#   - Traceroute
-#   - Comprobación Spamhaus DNSBL (IPv4)
-#
-# (R) hackingyseguridad.com
-#
+IP="$1"
 
-set -euo pipefail
+# Validar formato básico de IP (4 números separados por puntos)
+VALIDAR_IP=`echo "$IP" | awk -F. '{if (NF==4) print "valido"}'`
+if [ "x$VALIDAR_IP" != "xvalido" ]; then
+  echo "ERROR: Formato de IP inválido: $IP"
+  echo "Debe tener formato: xxx.xxx.xxx.xxx"
+  echo "Ejemplo: 8.8.8.8"
+  exit 1
+fi
 
-########################################
+# Verificar que existe el archivo de DNS
+if [ ! -f "$INPUT_DNS" ]; then
+  echo "ERROR: No se encuentra el archivo $INPUT_DNS"
+  echo "Crea un archivo con un servidor DNS por línea"
+  echo "Ejemplo:"
+  echo "  8.8.8.8"
+  echo "  1.1.1.1"
+  exit 1
+fi
 
-RED="\033[31m"
-GREEN="\033[32m"
-BLUE="\033[36m"
-YELLOW="\033[33m"
-NC="\033[0m"
+# Verificar que existe el archivo de listas
+if [ ! -f "$INPUT_LISTAS" ]; then
+  echo "ERROR: No se encuentra el archivo $INPUT_LISTAS"
+  echo "Crea un archivo con un FQDN de lista negra por línea"
+  echo "Ejemplo:"
+  echo "  zen.spamhaus.org"
+  echo "  sbl.spamhaus.org"
+  echo "  xbl.spamhaus.org"
+  exit 1
+fi
 
-########################################
+# Crear directorio de caché si no existe
+CACHE_DIR=`echo "$CACHE_FILE" | sed 's/\/[^/]*$//'`
+if [ ! -d "$CACHE_DIR" ]; then
+  mkdir -p "$CACHE_DIR"
+fi
 
-banner(){
+# Contar servidores DNS disponibles
+TOTAL_DNS=`grep -v '^$' "$INPUT_DNS" | wc -l`
+if [ "x$TOTAL_DNS" = "x" ] || [ $TOTAL_DNS -eq 0 ]; then
+  echo "ERROR: No hay servidores DNS válidos en $INPUT_DNS"
+  exit 1
+fi
 
-echo
-echo "========================================"
-echo "      IP Public Analyzer"
-echo "========================================"
-echo
+# Contar listas a consultar
+TOTAL_LISTAS=`grep -v '^$' "$INPUT_LISTAS" | wc -l`
+if [ "x$TOTAL_LISTAS" = "x" ] || [ $TOTAL_LISTAS -eq 0 ]; then
+  echo "ERROR: No hay listas válidas en $INPUT_LISTAS"
+  exit 1
+fi
 
-}
+# Cargar servidores DNS en un archivo temporal
+TEMP_DNS="/tmp/dns_list_$$.txt"
+grep -v '^$' "$INPUT_DNS" > "$TEMP_DNS"
+TOTAL_DNS=`wc -l < "$TEMP_DNS"`
 
-########################################
+# Cargar listas a consultar en un archivo temporal
+TEMP_LISTAS="/tmp/listas_$$.txt"
+grep -v '^$' "$INPUT_LISTAS" > "$TEMP_LISTAS"
+TOTAL_LISTAS=`wc -l < "$TEMP_LISTAS"`
 
-check_cmd(){
+# Invertir la IP para DNSBL
+REV=`echo "$IP" | awk -F "." '{print $4"."$3"."$2"."$1}'`
 
-command -v "$1" >/dev/null 2>&1 || {
-    echo "Falta instalar: $1"
-    exit 1
-}
+# Seleccionar servidor DNS (usamos el último octeto para rotar)
+ULTIMO_OCTETO=`echo "$IP" | awk -F "." '{print $4}'`
+MOD=`expr $ULTIMO_OCTETO % $TOTAL_DNS`
+if [ $MOD -eq 0 ]; then
+  MOD=$TOTAL_DNS
+fi
 
-}
+# Obtener el DNS correspondiente al índice
+DNS_SERVER=`sed -n "${MOD}p" "$TEMP_DNS"`
 
-########################################
+# Si no se pudo obtener, usar el primero
+if [ "x$DNS_SERVER" = "x" ]; then
+  DNS_SERVER=`head -1 "$TEMP_DNS"`
+fi
 
-for c in whois dig curl host traceroute nmap; do
-    check_cmd "$c"
+# Mostrar cabecera
+echo "============================================================"
+echo "   SCRIPT DE CONSULTA MÚLTIPLE RBL (Bash 1.0.x)"
+echo "   Consulta TODAS las listas para una IP"
+echo "============================================================"
+echo "IP consultada:     $IP"
+echo "DNS utilizado:     $DNS_SERVER"
+echo "Total de listas:   $TOTAL_LISTAS"
+echo "Archivo de salida: $OUTPUT_FILE"
+echo "============================================================"
+echo ""
+
+# Escribir cabecera en el archivo de resultados
+echo "============================================================" >> "$OUTPUT_FILE"
+echo "   SCRIPT DE CONSULTA MÚLTIPLE RBL (Bash 1.0.x)" >> "$OUTPUT_FILE"
+echo "   Fecha: `date`" >> "$OUTPUT_FILE"
+echo "============================================================" >> "$OUTPUT_FILE"
+echo "IP consultada: $IP" >> "$OUTPUT_FILE"
+echo "DNS utilizado: $DNS_SERVER" >> "$OUTPUT_FILE"
+echo "Total de listas: $TOTAL_LISTAS" >> "$OUTPUT_FILE"
+echo "============================================================" >> "$OUTPUT_FILE"
+echo "" >> "$OUTPUT_FILE"
+
+# Variables para esta IP
+ENCONTRADA=0
+CONTADOR_LISTAS=0
+
+# Recorrer TODAS las listas del archivo
+exec 4< "$TEMP_LISTAS"
+while read -r LISTA_FQDN <&4; do
+  # Saltar líneas vacías
+  if [ "x$LISTA_FQDN" = "x" ]; then
+    continue
+  fi
+
+  CONTADOR_LISTAS=`expr $CONTADOR_LISTAS + 1`
+  
+  # Mostrar progreso en pantalla
+  echo "[$CONTADOR_LISTAS/$TOTAL_LISTAS] Consultando: $LISTA_FQDN ..."
+  
+  # Realizar consulta DNS
+  RESULT=`dig +short "@$DNS_SERVER" "${REV}.${LISTA_FQDN}" A 2>/dev/null | head -1`
+
+  if [ ! -z "$RESULT" ]; then
+    # Verificar si es código de error (127.255.255.x)
+    ERROR_PREFIX=`echo "$RESULT" | awk -F "." '{print $1"."$2"."$3}'`
+    if [ "$ERROR_PREFIX" = "127.255.255" ]; then
+      # Es un error
+      MENSAJE="  ERROR en: $LISTA_FQDN (Código: $RESULT)"
+      echo "$MENSAJE"
+      echo "$MENSAJE" >> "$OUTPUT_FILE"
+      ERRORES=`expr $ERRORES + 1`
+    else
+      # Es un listado válido
+      ENCONTRADA=1
+      MENSAJE="  >>> LISTADA en: $LISTA_FQDN (Código: $RESULT)"
+      echo "$MENSAJE"
+      echo "$MENSAJE" >> "$OUTPUT_FILE"
+      echo "LISTED $IP -> $LISTA_FQDN ($RESULT)" >> "$CACHE_FILE"
+      LISTADAS=`expr $LISTADAS + 1`
+    fi
+  else
+    # No hay respuesta -> limpio en esta lista
+    MENSAJE="  LIMPI  en: $LISTA_FQDN"
+    echo "$MENSAJE"
+    echo "$MENSAJE" >> "$OUTPUT_FILE"
+  fi
 done
+exec 4<&-
 
-########################################
+# Limpiar archivos temporales
+rm -f "$TEMP_DNS" "$TEMP_LISTAS"
 
-get_public_ip(){
-
-curl -4 -fs https://ifconfig.me
-
-}
-
-########################################
-
-usage(){
-
-echo "Uso:"
-echo
-echo "  $0 <IP>"
-echo "  $0 --self"
-echo
-
-exit 1
-
-}
-
-########################################
-
-[[ $# -eq 0 ]] && usage
-
-if [[ "$1" == "--self" ]]; then
-    IP=$(get_public_ip)
+# Resumen final
+echo ""
+echo "============================================================"
+echo "   RESUMEN PARA IP: $IP"
+echo "============================================================"
+echo "Total de listas consultadas: $TOTAL_LISTAS"
+echo "LISTADAS en: $LISTADAS lista(s)"
+echo "LIMPIAS en:   `expr $TOTAL_LISTAS - $LISTADAS - $ERRORES` lista(s)"
+echo "ERRORES en:   $ERRORES lista(s)"
+echo "------------------------------------------------------------"
+if [ $ENCONTRADA -eq 1 ]; then
+  echo "RESULTADO: IP $IP -> LISTADA en lista negra"
 else
-    IP="$1"
+  if [ $ERRORES -eq $TOTAL_LISTAS ]; then
+    echo "RESULTADO: IP $IP -> ERROR en todas las consultas"
+  else
+    echo "RESULTADO: IP $IP -> LIMPIA (no listada en ninguna RBL)"
+  fi
 fi
+echo "============================================================"
+echo ""
+echo "Resultados guardados en: $OUTPUT_FILE"
 
-########################################
-
-banner
-
-echo -e "${BLUE}Fecha:${NC} $(date)"
-echo
-echo -e "${BLUE}IP:${NC} $IP"
-
-########################################
-
-echo
-echo "========== WHOIS =========="
-whois "$IP" || true
-
-########################################
-
-echo
-echo "========== PTR =========="
-dig +short -x "$IP"
-
-########################################
-
-echo
-echo "========== GEOLOCALIZACIÓN =========="
-curl -fs "https://ipapi.co/$IP/json/" | jq . || true
-
-########################################
-
-echo
-echo "========== SHODAN =========="
-curl -fs "https://internetdb.shodan.io/$IP" | jq . || true
-
-########################################
-
-echo
-echo "========== NMAP =========="
-nmap -Pn -n --top-ports 100 --open "$IP"
-
-########################################
-
-echo
-echo "========== TRACEROUTE =========="
-traceroute -n -w 2 "$IP" || true
-
-########################################
-# Spamhaus (IPv4)
-
-if [[ "$IP" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
-
-    echo
-    echo "========== SPAMHAUS =========="
-
-    REV=$(echo "$IP" | awk -F. '{print $4"."$3"."$2"."$1}')
-
-    LISTS=(
-        zen.spamhaus.org
-        sbl.spamhaus.org
-        xbl.spamhaus.org
-        pbl.spamhaus.org
-    )
-
-    for L in "${LISTS[@]}"
-    do
-
-        if host "$REV.$L" | grep -q "has address"; then
-            echo -e "${RED}LISTADA${NC} -> $L"
-            host "$REV.$L"
-        else
-            echo -e "${GREEN}OK${NC} -> $L"
-        fi
-
-    done
-
+# Escribir resumen en el archivo de resultados
+echo "" >> "$OUTPUT_FILE"
+echo "============================================================" >> "$OUTPUT_FILE"
+echo "   RESUMEN PARA IP: $IP" >> "$OUTPUT_FILE"
+echo "============================================================" >> "$OUTPUT_FILE
+echo "Total de listas consultadas: $TOTAL_LISTAS" >> "$OUTPUT_FILE"
+echo "LISTADAS en: $LISTADAS lista(s)" >> "$OUTPUT_FILE"
+echo "LIMPIAS en:   `expr $TOTAL_LISTAS - $LISTADAS - $ERRORES` lista(s)" >> "$OUTPUT_FILE"
+echo "ERRORES en:   $ERRORES lista(s)" >> "$OUTPUT_FILE"
+echo "------------------------------------------------------------" >> "$OUTPUT_FILE"
+if [ $ENCONTRADA -eq 1 ]; then
+  echo "RESULTADO: IP $IP -> LISTADA en lista negra" >> "$OUTPUT_FILE"
 else
-
-    echo
-    echo "Spamhaus DNSBL sólo soporta IPv4."
-
+  if [ $ERRORES -eq $TOTAL_LISTAS ]; then
+    echo "RESULTADO: IP $IP -> ERROR en todas las consultas" >> "$OUTPUT_FILE"
+  else
+    echo "RESULTADO: IP $IP -> LIMPIA (no listada en ninguna RBL)" >> "$OUTPUT_FILE"
+  fi
 fi
-
-echo
-
+echo "============================================================" >> "$OUTPUT_FILE"
+echo "Fecha de finalización: `date`" >> "$OUTPUT_FILE"
