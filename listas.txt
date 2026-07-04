@@ -1,3 +1,17 @@
+zen.spamhaus.org
+sbl.spamhaus.org
+xbl.spamhaus.org
+pbl.spamhaus.org
+css.spamhaus.org
+b.barracudacentral.org
+bl.spamcop.net
+cbl.abuseat.org
+dnsbl.sorbs.net
+dnsbl-1.uceprotect.net
+bl.mailspike.net
+all.spamrats.com
+
+
 0spam.fusionzero.com
 0spam-killlist.fusionzero.com
 0spamtrust.fusionzero.com
