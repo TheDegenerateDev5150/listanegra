@@ -86,11 +86,11 @@ https://multirbl.valli.org/lookup/$IP.html
 
 ## Instalar Git
 
-git clone https://github.com/hackingyseguridad/listanegra
-
+```bash
+git clone https://github.com/hackingyseguridad/listanegra.git
 cd listanegra
-
-chmod 777 *
+chmod +x *.sh
+```
 
 ### Consulta IPs en listas negras, blacklist IP
 
