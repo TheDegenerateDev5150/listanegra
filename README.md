@@ -50,6 +50,10 @@ Aparecer en el Top de los Peores (Top 10 Worst ASNs): Organizaciones como Spamha
 
 ### Consulta manual IP o dominio en lista negra ( blacklist )
 
+https://check.spamhaus.org/query/ip/<IP>
+
+<img align="left" alt="Listas Negras IP https://check.spamhaus.org/query/ip/<IP>" src="https://github.com/hackingyseguridad/listanegra/blob/main/spamhaus.png" style="margin-bottom: 20px;">
+
 https://www.spamhaus.org/xbl/
 
 https://www.abuseat.org/
@@ -59,8 +63,6 @@ https://www.abuseipdb.com/
 https://otx.alienvault.com/
 
 https://www.shodan.io/
-
-https://check.spamhaus.org/query/ip/<IP>
 
 https://whatismyipaddress.com/blacklist-check
 
