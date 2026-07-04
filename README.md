@@ -92,15 +92,25 @@ cd listanegra
 chmod +x *.sh
 ```
 
-### Consulta IPs en listas negras, blacklist IP
 
-./listanegra.sh     consulta mi IP actual
+### 📜 Scripts 
 
-./listanegra2.sh    consulta IPv4 o IPv6
+| Script | Función Principal | Modo de Uso | Descripción / Características |
+| :--- | :--- | :--- | :--- |
+| **`consulta.sh`** | **Lista múltiples RBLs desde archivo**: Lee las listas negras a consultar desde `listas.txt` y las IPs desde `ip.txt`, con rotación de DNS desde `dns.txt`. | `./consulta.sh` | Este script es el más completo. Permite personalizar tanto las listas negras (FQDNs) como los servidores DNS, y consulta **todas** las listas para cada IP. Guarda los resultados en `resultado.txt`. |
+| **`listanegra.sh`** | Consulta la IP pública actual del equipo y la verifica en listas negras. | `./listanegra.sh` | Útil para un chequeo rápido de tu propia IP de salida. No requiere argumentos. |
+| **`listanegra2.sh`** | Consulta una dirección IPv4 o IPv6 específica. | `./listanegra2.sh <IP>` | Permite consultar una IP arbitraria (pública o privada). Soporta IPv4 e IPv6. |
+| **`spamhaus.sh`** | Consulta las listas de Spamhaus (SBL, XBL, PBL, CSS) para las IPs en `ip.txt` de forma secuencial. | `./spamhaus.sh` | Versión dedicada a Spamhaus. Identifica el nombre exacto de la lista en la que está la IP (ej. `SBL`, `XBL`) para las IPs de `ip.txt`. |
+| **`spamhaus2.sh`** | Consulta las listas de Spamhaus desde `ip.txt` mostrando el nombre exacto de la lista. | `./spamhaus2.sh` | Similar a `spamhaus.sh`, probablemente con alguna variación en la salida o en el manejo de errores. |
 
-./checkip.sh        consulta una IP
+### 🔧 Archivos de Configuración (de entrada/salida)
 
-./check2.sh         consulta desde fichero  ip.txt
+| Archivo | Propósito | Formato |
+| :--- | :--- | :--- |
+| **`ip.txt`** | Archivo de entrada para la mayoría de scripts . Contiene las IPs a verificar, una por línea. | Ejemplo: `8.8.8.8` <br> `1.1.1.1` |
+| **`listas.txt`** | Archivo de configuración para `consulta.sh`. Contiene un FQDN de lista negra por línea. | Ejemplo: `zen.spamhaus.org` <br> `bl.spamcop.net` |
+| **`dns.txt`** | Archivo de configuración para `consulta.sh`. Contiene un servidor DNS por línea, que se rotan para distribuir las consultas. | Ejemplo: `8.8.8.8` <br> `1.1.1.1` |
+| **`resultado.txt`** | Archivo de salida generado por `consulta.sh`. Almacena los resultados de las consultas para cada IP. | (Generado automáticamente) |
 
 
 ### Códigos de Respuesta de Spamhaus
