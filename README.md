@@ -29,9 +29,9 @@ usadas por algunos firewall y tecnologías de seguridad:
 
 por ejemplo :
 
-**zen.spamhaus.org** (ZEN): Lista combinada que reúne la SBL, XBL y PBL en una sola consulta.  Es la principal fuente de reputación para Microsoft (Outlook/Hotmail), Google (Gmail), y miles de empresas.
+**zen.spamhaus.org** (ZEN)  Spamhaus Blocklist: Lista combinada que reúne la SBL, XBL y PBL en una sola consulta.  Es la principal fuente de reputación para Microsoft (Outlook/Hotmail), Google (Gmail), y miles de empresas.
 
-(SBL) Spamhaus Blocklist: lista de IP de spam o que albergan contenido malicioso. Incluye tanto IP individuales como rangos completos
+(SBL) lista de IP de spam o que albergan contenido malicioso. Incluye tanto IP individuales como rangos completos
 
 (XBL) Exploits Blocklist: Lista IP de equipos que han sido comprometidos y se utilizan para enviar spam o malware. 
 
