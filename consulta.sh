@@ -2,7 +2,7 @@
 # ============================================================================
 # consulta_blacklist.sh v1.0.0
 # Script de consulta de IPs en listas negras (BlackList) a partir de
-# /home/antonio/IA/todas.txt
+# ip.txt
 #
 # Uso:
 #   ./consulta_blacklist.sh <IP1> [IP2] [IP3] ...
@@ -15,7 +15,7 @@
 set -u
 
 VERSION="1.0.0"
-FUENTE="/home/antonio/IA/todas.txt"
+FUENTE="todas.txt"
 
 # --- Colores (si la salida es una TTY) --------------------------------------
 if [ -t 1 ]; then
@@ -164,3 +164,4 @@ if [ "$ENCONTRADAS" -gt 0 ]; then
   exit 1
 fi
 exit 0
+
