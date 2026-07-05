@@ -226,22 +226,6 @@ indica la lista de origen, pero si se necesita saber explícitamente cuál es si
 
 ---
 
-## Discrepancias conocidas entre el README/LEEME del repo y el código real
-
-Documentado aquí porque puede inducir a error si se sigue la tabla de scripts del README/LEEME
-al pie de la letra:
-
-1. **`consulta2.sh`**: el README dice que lee `listas.txt`/`dns.txt` con rotación de DNS; el
-   código real usa 7 listas fijas y la misma interfaz CLI que `consulta.sh` (sin leer esos ficheros).
-2. **`spamhaus.sh`**: el README dice que consulta IPs desde `ip.txt`; el código real toma la IP
-   como argumento único (`./spamhaus.sh <IP>`), no lee `ip.txt`. Es `spamhaus2.sh` el que usa `ip.txt`.
-3. **`listanegra2.sh`**: pese al nombre y a los comentarios que sugieren soporte IPv4/IPv6, la
-   inversión de octetos con `awk -F.` no procesa IPv6 — solo funciona con IPv4.
-4. **`listanegra.sh`/`listanegra2.sh`**: los comentarios de cabecera describen `listas.txt` con
-   formato `nombre|dominio|descripcion`, pero el fichero real solo tiene el dominio por línea. El
-   `cut -d'|'` sin delimitador devuelve la línea completa en cada campo, así que el script sigue
-   funcionando (consulta el dominio correctamente), pero el nombre/descripción mostrados en pantalla
-   son el propio dominio repetido, no una etiqueta descriptiva.
 
 ---
 
