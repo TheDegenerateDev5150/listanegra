@@ -58,10 +58,11 @@ Aparecer en el Top de los Peores (Top 10 Worst ASNs): Organizaciones como Spamha
 
 ### Consulta manual IP o dominio en lista negra ( blacklist )
 
-Por ejemplo.:  https://check.spamhaus.org/query/ip/<IP>
+Por ejemplo.:  https://check.spamhaus.org/query/ip/80.58.71.71
 
 <img align="left" alt="Listas Negras IP https://check.spamhaus.org/query/ip/" src="https://github.com/hackingyseguridad/listanegra/blob/main/spamhaus.png" style="margin-bottom: 20px;">
 
+###
 
 | **URL** | **Descripción breve** |
 | :--- | :--- |
