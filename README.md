@@ -102,7 +102,7 @@ Basado en el análisis detallado del contenido actual de los scripts en el repos
 | **`spamhaus.sh`** | **Consulta dedicada a Spamhaus** para IPs en `ip.txt` con identificación de lista específica. | `./spamhaus.sh` | Versión especializada que consulta todas las listas de Spamhaus (SBL, XBL, PBL, CSS, ZEN, DBL) y muestra el nombre exacto de la lista donde aparece la IP. |
 | **`spamhaus2.sh`** | **Consulta Spamhaus desde archivo** mostrando nombre exacto de la lista. | `./spamhaus2.sh` | Similar a `spamhaus.sh`, lee IPs desde `ip.txt` y muestra el nombre de la lista específica de Spamhaus donde está listada la IP. |
 
-## 📝 Notas importantes actualizadas:
+### 📝 Notas importantes actualizadas:
 
 1. **`consulta.sh`** es el script más flexible, soportando:
    - IPs como argumentos: `./consulta.sh 8.8.8.8 1.1.1.1`
