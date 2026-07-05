@@ -1,200 +1,282 @@
+---
+name: blacklist-ip
+description: >
+  Usar esta skill SIEMPRE que el usuario quiera comprobar si una IP, rango de IPs o dominio
+  está en una lista negra (blacklist), RBL o DNSBL (Spamhaus, SORBS, Barracuda, UCEPROTECT, etc.).
+  Activar cuando se mencionen: lista negra, blacklist, DNSBL, RBL, IP listada/bloqueada, reputación
+  de IP, spam blacklist, comprobar reputación de dominio/correo, deliverability de email, servidor
+  SMTP bloqueado, o IP marcada como spam/phishing/malware/botnet/proxy abierto. También activar
+  cuando el usuario proporcione una IP o fichero de IPs y pida: auditar reputación, verificar
+  blacklisting, sacar de lista negra (delisting), o análisis forense de por qué un servidor de
+  correo rebota. Repositorio de referencia: https://github.com/hackingyseguridad/listanegra
+---
 
 
+# Blacklist IP Skill — hackingyseguridad/listanegra
 
+Skill de auditoría de reputación IP basada en 6 scripts DNS (`sh`/`bash`, sin dependencias
+externas más allá de `dig`) que consultan contra Spamhaus y ~190 RBL/DNSBL adicionales, más
+paneles web de verificación cruzada y delisting. Documentación reconstruida a partir del código
+fuente real de cada script (no solo del README/LEEME, cuya tabla de scripts contiene descripciones
+que no coinciden exactamente con el comportamiento real — ver **Discrepancias conocidas** al final).
 
-<img align="left" alt="Listas Negras IP - hackingyseguridad.com" src="https://github.com/hackingyseguridad/listanegra/blob/main/blacklist.png" style="margin-bottom: 20px;">
+Motivo por el que una IP acaba en lista negra (contexto para el análisis):
 
-## Listanegra
+1. Spam de correo electrónico, phishing, scam, bulletproof hosting, spambots.
+2. Sitios de phishing / suplantación de identidad.
+3. Distribución de malware / equipos infectados.
+4. Command & Control de botnets / equipos zombis.
+5. Proxies abiertos HTTP/SOCKS comprometidos.
 
-### BlackList IP:
+**Umbral crítico a nivel de AS:** si ~20% de las IPs activas de un proveedor están listadas, o si
+ese AS aparece en el Top 10 peores ASN de Spamhaus, los filtros más estrictos (Spamhaus, UCEPROTECT
+Nivel 3) bloquean el rango completo de forma preventiva — dato útil para justificar severidad en
+informes de organizaciones con IP compartida/hosting.
 
-[listas negras](LISTAS.md) de IP / Blacklist IP,  son herramientas técnicas  para filtrar y evitar IP o dominios utilizados para: 
+---
 
-1º.- Spam de correo electronico, Phissing email, SCAM. Spam distribuido en múltiples IPs. Spam support services. Servidores de bulletproof hosting. Spambots	Equipos enviando spam localmente
-
-2º.- Phishing sites. Sitios de suplantación de identidad. 
-
-3º.- Malware distribution. Sitios que distribuyen malware. IPs infectadas	PCs/equipos con malware
-
-4º.- Botnet C&C. Servidores de control de botnets. Botnet zombies	Equipos parte de botnets.
-
-5º.- Proxy abiertos	Proxies HTTP/SOCKS comprometidos.
-
-###  Impacto IP listada:
-
-estar listado en Blacklist lista negra podría tener alguna consecuencia por bloqueos y reputación en listas 
-usadas por algunos firewall y tecnologías de seguridad:
-
-1º.- correo-email: Los servidores de destino rechazarán automáticamente emails o los enviarán directo a la carpeta de spam.
-
-2º.- La IP o el rango, aparecemos como no confiables, ante los proveedores de servicios de internet (ISPs).
-
-3º.-. Bloqueos/filtros: en algunos casos, se puede bloquear el acceso a servicios en la nube que validan la seguridad de la IP, si estas aparecen listadas; algunas listas negras, especialmente las más agresivas, pueden optar por listar rangos CIDR (por ejemplo, 192.0.2.0/24) si consideran que toda una red es problemática 
-
-por ejemplo :
-
-**(ZEN) Spamhaus Blocklist**: Lista combinada que reúne la SBL, XBL y PBL en una sola consulta.  Es la principal fuente de reputación para Microsoft (Outlook/Hotmail), Google (Gmail), y miles de empresas. https://www.spamhaus.org/blocklists/ 
-
-**(SBL) Spamhous Blocklist**: lista de IP de spam o que albergan contenido malicioso. Incluye tanto IP individuales como rangos completos
-
-**(XBL) Spamhous Exploits Blocklist**: Lista IP de equipos que han sido comprometidos y se utilizan para enviar spam o malware. 
-
-**(PBL) Spamhous Policy Blocklist** : lista de IP que no deberían enviar correo directamente a un servidor de correo.
-
-**(CSS): Spamhous Combined Spam Sources**: lista IP que envían correo de baja reputación, sin verificaciones SPF, DKIM, DMARK
-
-**bl.spamcop.net** SpamCop es una de las bases de datos de spam más respetadas. 
-
-**dnsbl.sorbs.net** y dnsbl-1.uceprotect.net Son listas muy estrictas. Muchos servidores de correo las 
-usan para puntuar negativamente el correo entrante (lo que hace que tus emails vayan a la carpeta 
-de SPAM).
-
-**barracudacentral.org** Es el sistema de reputación de Barracuda Networks, uno de los firewalls de 
-email más vendidos del mundo.
-
-### El umbral crítico: 20 % de IP Listadas de un AS (BGP sistema autonomo)
-
-Las listas negras más estrictas a nivel de red (como UCEPROTECT Nivel 3 o los sistemas de reputación de Spamhaus) automatizan el bloqueo de un AS completo bajo estas condiciones:
-
-**20% de sus IPs activas listadas:** Si una de cada cinco IPs de un proveedor está listada, los filtros consideran que el AS está ***"fuera de control"***.
-
-Aparecer en el Top de los Peores (Top 10 Worst ASNs): Organizaciones como Spamhaus publican diariamente una lista de los  **10 AS Sistemas Autónomos** con peor comportamiento del mundo. Si un ISP entra ahí, cientos de miles de servidores de correo en todo el planeta activan automáticamente una regla de bloqueo preventivo de todo su rango.
-
-### Consulta manual IP o dominio en lista negra ( blacklist )
-
-por ejemplo.:  https://check.spamhaus.org/query/ip/80.58.71.71
-
-<img align="left" alt="Listas Negras IP https://check.spamhaus.org/query/ip/" src="https://github.com/hackingyseguridad/listanegra/blob/main/spamhaus.png" style="margin-bottom: 20px;">
-
-### -
-
-| URL | Descripción |
-| :--- | :--- |
-| https://check.spamhaus.org/query/ip/ | **Verificador de Spamhaus**. Consulta el estado de una IP en sus listas (SBL, XBL, PBL, CSS). |
-| https://multirbl.valli.org/lookup/$IP.html | **Verificador múltiple**. Comprueba una IP en más de 120 listas RBL/DNSBL diferentes. |
-| https://whatismyipaddress.com/blacklist-check | **Herramienta de verificación**. Consulta el estado de tu IP en unas 50 bases de datos antispam. |
-| https://blacklistalert.org/ | **Servicio de monitorización**. Permite verificar IPs/dominios y recibir alertas sobre listados. |
-| https://www.dnsbl.info/ | **Buscador de DNSBL**. Consulta el estado de una IP en más de 100 listas negras basadas en DNS. |
-| https://mxtoolbox.com/ | **Conjunto de herramientas de red**. Incluye un verificador que chequea IPs contra 105 listas DNSBL. |
-| https://www.abuseipdb.com/ | **Base de datos colaborativa**. Permite consultar y reportar IPs que han realizado actividades maliciosas. |
-| https://www.abuseat.org/ | **CBL (Composite Blocking List)**. Informativo sobre esta lista negra específica. |
-
-## Instalar Git
+## FASE 0 — Preparación del entorno
 
 ```bash
-git clone https://github.com/hackingyseguridad/listanegra.git
+git clone https://github.com/hackingyseguridad/listanegra
 cd listanegra
 chmod +x *.sh
 ```
 
+**Única dependencia real de los 6 scripts: `dig` (paquete `dnsutils`/`bind-utils`).** Ningún
+script del repositorio invoca `whois`, `nmap`, `curl`, `traceroute` ni `jq` — no son necesarios
+para esta skill.
 
-### 📜 Scripts 
+```bash
+sudo apt install -y dnsutils
+```
 
-# Actualización de la tabla de scripts del repositorio listanegra
+**Ficheros de configuración (compartidos por varios scripts):**
 
-Basado en el análisis detallado del contenido actual de los scripts en el repositorio, aquí está la tabla actualizada con la información real:
-
-| Script | Función Principal | Modo de Uso | Descripción / Características |
-| :--- | :--- | :--- | :--- |
-| **`consulta.sh`** | **Consulta múltiples IPs en listas negras mediante DNS** con soporte para argumentos, fichero o stdin. | `./consulta.sh <IP1> [IP2] ...`<br>`./consulta.sh -f <fichero>`<br>`cat ip.txt \| ./consulta.sh -` | **Script versátil** que permite consultar IPs de diversas formas. Por defecto usa `zen.spamhaus.org` como única lista. Guarda resultados en `resultado.txt` con colores en terminal. Incluye validación de IPs y resumen final. |
-| **`consulta2.sh`** | **Versión extendida de consulta.sh** que utiliza múltiples listas negras desde archivo de configuración. | `./consulta2.sh` | Lee las listas desde `listas.txt` y las IPs desde `ip.txt`. Realiza rotación de DNS desde `dns.txt`. Es el script más completo para consultas masivas con múltiples RBLs. |
-| **`listanegra.sh`** | **Consulta automática de IP pública** del equipo en listas negras. | `./listanegra.sh` | Obtiene la IP pública de salida y la verifica contra `zen.spamhaus.org`, `bl.spamcop.net`, `dnsbl.sorbs.net`, `b.barracudacentral.org` y `dnsbl-1.uceprotect.net`. Útil para chequeo rápido de reputación. |
-| **`listanegra2.sh`** | **Consulta de IP específica** (IPv4 o IPv6) en listas negras. | `./listanegra2.sh <IP>` | Permite consultar una IP arbitraria con soporte para IPv4 e IPv6. Verifica contra `zen.spamhaus.org`, `bl.spamcop.net`, `dnsbl.sorbs.net`, `b.barracudacentral.org` y `dnsbl-1.uceprotect.net`. |
-| **`spamhaus.sh`** | **Consulta dedicada a Spamhaus** para IPs en `ip.txt` con identificación de lista específica. | `./spamhaus.sh` | Versión especializada que consulta todas las listas de Spamhaus (SBL, XBL, PBL, CSS, ZEN, DBL) y muestra el nombre exacto de la lista donde aparece la IP. |
-| **`spamhaus2.sh`** | **Consulta Spamhaus desde archivo** mostrando nombre exacto de la lista. | `./spamhaus2.sh` | Similar a `spamhaus.sh`, lee IPs desde `ip.txt` y muestra el nombre de la lista específica de Spamhaus donde está listada la IP. |
-
-### 📝 Notas importantes actualizadas:
-
-1. **`consulta.sh`** es el script más flexible, soportando:
-   - IPs como argumentos: `./consulta.sh 8.8.8.8 1.1.1.1`
-   - Fichero con `-f`: `./consulta.sh -f ip.txt`
-   - Entrada estándar: `cat ip.txt | ./consulta.sh -`
-   - Validación de formato de IP
-   - Salida con colores en terminal
-   - Resumen estadístico al final
-
-2. **`consulta2.sh`** extiende la funcionalidad permitiendo:
-   - Múltiples listas negras desde `listas.txt`
-   - Rotación de servidores DNS desde `dns.txt`
-   - Consulta masiva de IPs desde `ip.txt`
-
-3. **Archivos de configuración:**
-   - `ip.txt`: IPs a consultar (una por línea)
-   - `listas.txt`: FQDNs de listas negras (ej. `zen.spamhaus.org`)
-   - `dns.txt`: Servidores DNS para rotación (ej. `8.8.8.8`, `1.1.1.1`)
-   - `resultado.txt`: Salida generada por `consulta.sh`
-
-4. **Spamhaus códigos de respuesta** documentados en el repositorio para interpretar correctamente los resultados.
+| Fichero | Contenido | Usado por |
+|---|---|---|
+| `ip.txt` | Una IP por línea (**no viene en el repo, hay que crearlo**) | `listanegra2.sh`, `spamhaus2.sh` |
+| `listas.txt` | ~190 dominios RBL, uno por línea (formato plano, **no** `nombre\|dominio\|descripcion` pese a lo que dicen los comentarios de cabecera de `listanegra.sh`/`listanegra2.sh`) | `listanegra.sh`, `listanegra2.sh` |
+| `dns.txt` | Servidores DNS a usar, uno por línea. **La primera línea es `127.0.0.1`** — si la máquina no tiene resolver local escuchando ahí, las consultas que caigan en esa línea fallarán. Conviene editar el fichero y quitar/mover esa línea antes de auditar desde una máquina sin resolver local. | `listanegra.sh`, `listanegra2.sh`, `spamhaus.sh`, `spamhaus2.sh` |
+| `resultado.txt` | Fichero de salida — **todos los scripts escriben en el mismo nombre** y lo truncan al empezar. Renombrar/copiar el resultado entre ejecuciones si se quieren conservar varias auditorías. | Todos |
 
 ---
 
-### Códigos de Respuesta de Spamhaus
+## Tabla de scripts (comportamiento verificado en el código)
 
-| Código de Retorno | Lista / Tipo | Significado | Zona de Consulta | Acción Recomendada |
-|:---:|:---|:---|:---|:---|
-| **127.0.0.2** | SBL | Spamhaus Blocklist: IP involucrada en spam, phishing o alojamiento malicioso | `sbl`, `sbl-xbl`, `zen` | Bloquear / Marcar |
-| **127.0.0.3** | CSS | Combined Spam Sources: IP detectada como fuente de spam de forma automática | `sbl`, `sbl-xbl`, `zen` | Bloquear / Marcar |
-| **127.0.0.4** | XBL | Exploits Blocklist: Equipo comprometido (botnet, malware) que envía spam | `xbl`, `sbl-xbl`, `zen` | Bloquear / Marcar |
-| **127.0.0.9** | DROP | Don't Route Or Peer: Rangos de IP utilizados por ciberdelincuentes (siempre se devuelve **además** de otro código) | `sbl`, `sbl-xbl`, `zen` | Bloquear / Marcar |
-| **127.0.0.10** | PBL | Policy Blocklist: IP mantenida por el ISP, de una red que no debería enviar correo directamente | `pbl`, `zen` | Bloquear / Marcar (con precaución) |
-| **127.0.0.11** | PBL | Policy Blocklist: IP mantenida por Spamhaus, de una red que no debería enviar correo directamente | `pbl`, `zen` | Bloquear / Marcar (con precaución) |
-| **127.0.0.30** | BCL | Botnet Controller List: IP que aloja un servidor de Comando y Control (C&C) de una botnet | `sbl`, `sbl-xbl`, `zen` | Bloquear / Marcar |
-| **127.0.1.2** | DBL | Domain Blocklist: Dominio de baja reputación (spam) | `dbl` | Bloquear / Marcar |
-| **127.0.1.4** | DBL | Domain Blocklist: Dominio relacionado con phishing | `dbl` | Bloquear / Marcar |
-| **127.0.1.5** | DBL | Domain Blocklist: Dominio relacionado con malware | `dbl` | Bloquear / Marcar |
-| **127.0.1.6** | DBL | Domain Blocklist: Dominio usado como C&C de botnet | `dbl` | Bloquear / Marcar |
-| **127.0.1.102** | DBL | Abused-legit: Dominio legítimo comprometido usado para spam | `dbl` | Bloquear / Marcar |
-| **127.0.1.103** | DBL | Abused-legit: Dominio legítimo comprometido usado para phishing | `dbl` | Bloquear / Marcar |
-| **127.0.1.104** | DBL | Abused-legit: Dominio legítimo comprometido usado para malware | `dbl` | Bloquear / Marcar |
-| **127.0.1.105** | DBL | Abused-legit: Dominio legítimo comprometido usado para botnet C&C | `dbl` | Bloquear / Marcar |
-| **127.0.1.106** | DBL | Abused-legit: Dominio legítimo comprometido (sin especificar) | `dbl` | Bloquear / Marcar |
-| **127.0.2.2 - .24** | ZRD | Zero Reputation Domain: Dominios vistos por primera vez. El número indica antigüedad (2-24 horas) | `zrd` | Marcar (con precaución) |
-| **127.255.255.252** | ERROR | Error tipográfico: El nombre de la lista negra está mal escrito | *cualquiera* | **NO BLOQUEAR**. Revisar ortografía del FQDN |
-| **127.255.255.254** | ERROR | Consulta a través de resolver público (8.8.8.8, etc.) | *cualquiera* | **NO BLOQUEAR**. Configurar DNS local |
-| **127.255.255.255** | ERROR | Exceso de consultas: Superado el límite de la política de uso justo | *cualquiera* | **NO BLOQUEAR**. Reducir velocidad o usar DQS |
-| **127.0.1.255** | ERROR | Consulta a DBL con IP en lugar de dominio | `dbl` | **NO BLOQUEAR**. Usar dominio en lugar de IP |
+| Script | Entrada | Listas consultadas | Comportamiento clave |
+|---|---|---|---|
+| `consulta.sh` | IP(s) por argumento, `-f fichero` o stdin (`-`) | Solo `zen.spamhaus.org` | El más simple. Valida formato IP, colorea en TTY, guarda en `resultado.txt`, resumen con contadores. Exit code 1 si alguna IP está listada. |
+| `consulta2.sh` | Igual que `consulta.sh` (argumento/`-f`/stdin) | 7 listas **fijas en el código**: `zen.spamhaus.org`, `b.barracudacentral.org`, `bl.spamcop.net`, `dyna.spamrats.com`, `noptr.spamrats.com`, `spam.spamrats.com`, `dnsbl.sorbs.net` | Copia casi idéntica de `consulta.sh` con más listas hardcodeadas. **No lee `listas.txt` ni `dns.txt`** pese a lo que indica la tabla de scripts del README/LEEME del repo. |
+| `listanegra.sh` | Una IP por argumento: `./listanegra.sh <IP>` | Las ~190 de `listas.txt` | Recorre `listas.txt` en orden y **se detiene en el primer match** (`break`) — si la IP está listada en varias RBL solo se informa de la primera encontrada, no de todas. Usa siempre la primera línea de `dns.txt` como servidor DNS (sin rotación real). Puede tardar si tiene que recorrer las ~190 listas sin encontrar coincidencia. |
+| `listanegra2.sh` | Fichero `ip.txt` (una IP por línea, **no admite IP por argumento**) | Las ~190 de `listas.txt`, para cada IP del fichero | Rota el servidor DNS de `dns.txt` según el número de IP procesada (`nº_ip % total_dns`). Igual que `listanegra.sh`, se detiene en el primer match por IP. Pese al nombre y a los comentarios de cabecera, **no hay soporte real de IPv6**: la inversión de octetos usa `awk -F.`, que no funciona con direcciones IPv6. |
+| `spamhaus.sh` | Una IP por argumento: `./spamhaus.sh <IP>` | Solo Spamhaus: `sbl` → `xbl` → `pbl` → `css`, en ese orden, **cortocircuito** (se detiene en el primer match) | Identifica la lista exacta y el código de retorno. Selecciona el DNS de `dns.txt` según el último octeto de la IP `% total_dns`. **No lee `ip.txt`**, pese a lo que indica el README/LEEME. |
+| `spamhaus2.sh` | Fichero `ip.txt` (una IP por línea) | Igual que `spamhaus.sh` (SBL→XBL→PBL→CSS, cortocircuito) para cada IP del fichero | Versión batch de `spamhaus.sh`. |
+
+> Los scripts `checkip.sh` y `check2.sh` mencionados en versiones anteriores de esta skill
+> **no existen** en el repositorio actual; han sido sustituidos por `consulta.sh`/`consulta2.sh`
+> y `listanegra.sh`/`listanegra2.sh`.
 
 ---
 
-### 📝 Notas: 
+## FASE 1 — Triage rápido (una o varias IPs sueltas)
 
-1. **Códigos de error (`127.255.255.x` y `127.0.1.255`)**  
-   Estos códigos **NO** indican que la IP o dominio esté en una lista negra. Son problemas con tu consulta y **no debes bloquear el tráfico basándote en ellos**. Si los ves, revisa tu configuración de DNS o la frecuencia de tus consultas.
+`consulta.sh` es la opción recomendada para un primer vistazo — rápida porque solo consulta ZEN:
 
-2. **`127.0.0.9` (DROP)**  
-   Este código siempre se devuelve **además** de otro código de listado (ej. `127.0.0.2`). Indica que la IP pertenece a un rango completo que está en la lista DROP.
+```bash
+./consulta.sh 81.41.255.99
+./consulta.sh 81.41.255.99 213.4.212.1 5.205.0.1
+./consulta.sh -f ip.txt
+cat ip.txt | ./consulta.sh -
+```
 
-3. **`127.0.0.10` y `127.0.0.11` (PBL)**  
-   Estas IPs son de redes residenciales o dinámicas que **no deberían enviar correo directamente**. Bloquearlas puede causar falsos positivos si el correo se envía a través del servidor del ISP.
+Salida: `[LISTADA]`, `[LIMPIA]` o `[INVÁLIDA]` por IP, más resumen final en `resultado.txt`.
 
-4. **ZRD (`127.0.2.2 - .24`)**  
-   El número final (ej. `.12`) indica la antigüedad del dominio en horas. Un dominio visto por primera vez no es necesariamente malicioso, pero merece un escrutinio adicional.
-
-5. **DBL (`127.0.1.x`)**  
-   La lista DBL solo funciona con **nombres de dominio**, no con IPs. Si consultas `dbl.spamhaus.org` con una IP invertida, obtendrás `127.0.1.255`.
-
-6. **Uso de `zen.spamhaus.org`**  
-   La lista ZEN combina SBL, XBL, PBL y CSS. Al consultar ZEN, recibirás el código de la lista que corresponda (ej. `127.0.0.2` para SBL). **No sabrás de qué lista específica proviene** a menos que consultes cada lista por separado.
+Si el triage con ZEN sale limpio pero se quiere algo más de cobertura sin pagar el coste de las
+~190 listas, usar `consulta2.sh` con la misma sintaxis (7 listas: Spamhaus ZEN, Barracuda,
+SpamCop, SpamRATS x3, SORBS).
 
 ---
 
-### 🔧 Referencias:
+## FASE 2 — Verificación específica en Spamhaus (SBL/XBL/PBL/CSS por separado)
 
-- [Spamhaus Blocklists - Documentación Oficial](https://www.spamhaus.org/blocklists/)
-- [Spamhaus FAQ - Códigos de Respuesta](https://www.spamhaus.org/faq/)
-- [Política de Uso Justo (Fair Use Policy)](https://www.spamhaus.org/organization/dnsblusage/)
+Útil cuando se necesita saber **en cuál** de las listas de Spamhaus aparece exactamente la IP
+(distinto impacto en el informe según sea SBL, XBL, PBL o CSS):
+
+```bash
+# Una IP
+./spamhaus.sh <IP>
+
+# Lote desde ip.txt
+cat > ip.txt << 'EOF'
+203.0.113.10
+198.51.100.25
+EOF
+./spamhaus2.sh
+```
+
+**Interpretación (recordar que ambos scripts paran en el primer match, orden SBL→XBL→PBL→CSS):**
+- `SBL` → IP involucrada en spam, phishing o hosting malicioso.
+- `XBL` → equipo comprometido (botnet/malware) enviando spam.
+- `PBL` → red residencial/dinámica que no debería enviar correo directo (no implica compromiso).
+- `CSS` → correo de baja reputación / sin SPF-DKIM-DMARC.
+- Si el script informa "LIMPIA", solo significa que no está en la primera lista comprobada de la
+  cadena que dé positivo — pero al pararse en el primer match, un resultado limpio sí es
+  fiable (comprobó las 4 sin encontrar nada).
+
+---
+
+## FASE 3 — Auditoría completa contra ~190 RBL/DNSBL
+
+Para una auditoría exhaustiva (recomendado cuando el triage de FASE 1 ya dio positivo, o para
+línea base de reputación de un cliente):
+
+```bash
+# Una IP
+./listanegra.sh <IP>
+
+# Lote desde ip.txt (rota servidores DNS de dns.txt entre IPs)
+./listanegra2.sh
+```
+
+**Importante:** ambos scripts se detienen en el **primer** RBL que dé positivo — para saber
+en *cuántas* listas distintas aparece una IP concreta (dato relevante para el informe: una sola
+lista secundaria pesa poco, estar en 10+ indica reputación gravemente comprometida) hay que
+consultarla adicionalmente con `multirbl.valli.org` (FASE 4) o iterar manualmente sobre
+`listas.txt` con `dig`.
+
+Referencia de las ~190 listas incluidas, agrupadas por tipo de amenaza (combinada, spam,
+malware/botnet, proxy/Tor, phishing, política/whitelist), en `LISTAS.md` del repositorio.
+Las más relevantes para priorizar hallazgos: `zen.spamhaus.org`, `cbl.abuseat.org`,
+`dnsbl.sorbs.net`, `b.barracudacentral.org`, `bl.spamcop.net`, `dnsbl-3.uceprotect.net`,
+`drone.abuse.ch`, `dyna.spamrats.com`.
+
+---
+
+## FASE 4 — Consulta manual / verificación cruzada (web)
+
+Cuando se requiera confirmación visual, evidencia para el informe, o el enlace directo de delisting:
+
+| Servicio | URL |
+|---|---|
+| Spamhaus (consulta directa) | https://check.spamhaus.org/query/ip/$IP |
+| MultiRBL (Valli) — >120 RBL | https://multirbl.valli.org/lookup/$IP.html |
+| MXToolbox — 105 DNSBL | https://mxtoolbox.com/ |
+| DNSBL.info — >100 listas | https://www.dnsbl.info/ |
+| WhatIsMyIPAddress Blacklist Check — ~50 BD | https://whatismyipaddress.com/blacklist-check |
+| BlacklistAlert (monitorización) | https://blacklistalert.org/ |
+| AbuseIPDB (colaborativa) | https://www.abuseipdb.com/ |
+| CBL / abuseat.org | https://www.abuseat.org/ |
+
+Estos paneles suelen incluir el enlace directo de **delisting/removal request** cuando la IP figura
+listada, dato imprescindible para la sección de remediación del informe.
+
+---
+
+## FASE 5 — Decisión: siguiente paso según resultado
+
+| Resultado | Acción recomendada |
+|---|---|
+| No listada en ninguna RBL | Documentar como OK / baseline de reputación limpia |
+| Listada solo en RBL secundarias/experimentales | Riesgo bajo, monitorizar, revisar SPF/DKIM/DMARC |
+| Listada en Spamhaus PBL | Verificar si la IP es dinámica/residencial y no debería enviar correo directo (usar smarthost/relay del ISP) |
+| Listada en Spamhaus SBL/XBL/CSS/ZEN, SORBS, Barracuda o UCEPROTECT | Riesgo alto: iniciar investigación de compromiso (malware, relay abierto, cuenta comprometida) antes de solicitar delisting |
+| IP forma parte de un AS con ≥20% de rango listado o en el Top 10 peores ASN de Spamhaus | Riesgo de bloqueo preventivo de todo el rango — escalar a nivel de proveedor, no solo de IP |
+
+---
+
+## FASE 6 — Remediación / Delisting (checklist)
+
+1. Confirmar y **corregir la causa raíz** (limpiar malware, cerrar relay/proxy abierto, rotar
+   credenciales SMTP comprometidas, filtrar salida SMTP con firewall).
+2. Verificar registros de autenticación de correo: SPF, DKIM y DMARC correctamente publicados.
+3. Solicitar el delisting en cada RBL donde aparezca (cada proveedor tiene su propio formulario;
+   Spamhaus: https://check.spamhaus.org/query/ip/$IP incluye el enlace de "Remove me from this list").
+4. Volver a ejecutar `consulta.sh`/`listanegra.sh` transcurridas 24–72h para confirmar la baja.
+5. Monitorización continua recomendada (cron diario con `consulta.sh -f ip.txt` sobre las IPs de
+   salida SMTP de la organización).
+
+---
+
+## Tabla de códigos de retorno de Spamhaus
+
+| Código | Lista | Significado | Acción |
+|:---:|:---|:---|:---|
+| `127.0.0.2` | SBL | IP involucrada en spam, phishing o alojamiento malicioso | Bloquear / Marcar |
+| `127.0.0.3` | CSS | Fuente de spam detectada automáticamente | Bloquear / Marcar |
+| `127.0.0.4` | XBL | Equipo comprometido (botnet, malware) enviando spam | Bloquear / Marcar |
+| `127.0.0.9` | DROP | Rango usado por ciberdelincuentes (siempre viene además de otro código) | Bloquear / Marcar |
+| `127.0.0.10` | PBL (ISP) | Red que no debería enviar correo directo | Bloquear con precaución |
+| `127.0.0.11` | PBL (Spamhaus) | Red que no debería enviar correo directo | Bloquear con precaución |
+| `127.0.0.30` | BCL | Servidor C&C de botnet | Bloquear / Marcar |
+| `127.0.1.2` | DBL | Dominio de baja reputación (spam) | Bloquear / Marcar |
+| `127.0.1.4` | DBL | Dominio relacionado con phishing | Bloquear / Marcar |
+| `127.0.1.5` | DBL | Dominio relacionado con malware | Bloquear / Marcar |
+| `127.0.1.6` | DBL | Dominio usado como C&C de botnet | Bloquear / Marcar |
+| `127.0.1.102–106` | DBL (abused-legit) | Dominio legítimo comprometido (spam/phishing/malware/C&C) | Bloquear / Marcar |
+| `127.0.2.2–24` | ZRD | Dominio de reputación cero, visto por primera vez hace 2–24h | Marcar con precaución |
+| `127.255.255.252` | ERROR | FQDN de la lista mal escrito | **No bloquear** — revisar ortografía |
+| `127.255.255.254` | ERROR | Consulta vía resolver público (8.8.8.8, etc.) | **No bloquear** — usar DNS local |
+| `127.255.255.255` | ERROR | Límite de uso justo superado | **No bloquear** — reducir velocidad o usar DQS |
+| `127.0.1.255` | ERROR | Consulta a DBL con IP en vez de dominio | **No bloquear** — DBL solo admite dominios |
+
+Nota: `zen.spamhaus.org` combina SBL+XBL+PBL+CSS en una sola consulta — el código de retorno
+indica la lista de origen, pero si se necesita saber explícitamente cuál es sin ambigüedad, usar
+`spamhaus.sh`/`spamhaus2.sh`, que consultan cada lista por separado.
 
 ---
 
 
+---
 
-#
+## PLANTILLA DE HALLAZGO PARA INFORME
 
-http://www.hackingyseguridad.com/
+```
+HALLAZGO: IP en lista negra (Blacklist / DNSBL)
+IP/Rango:  [objetivo]
+PTR:       [resultado de dig -x, si se ha comprobado aparte]
+ASN/Whois: [organización propietaria, si se ha comprobado aparte]
+CVSS v3.1: N/A (hallazgo operativo, no vulnerabilidad técnica clásica) — clasificar como
+           Informativo/Medio/Alto según impacto en entregabilidad de correo
 
-#
+LISTAS EN LAS QUE APARECE:
+- zen.spamhaus.org (SBL/XBL/PBL/CSS) -> [SI/NO — código de retorno]
+- [otras RBL detectadas por listanegra.sh / consulta2.sh / multirbl.valli.org]
 
+DESCRIPCIÓN:
+[Contexto: motivo probable — spam, phishing, malware, botnet C&C, proxy abierto]
 
+EVIDENCIA:
+$ ./consulta.sh <IP>
+[output recortado]
+$ ./spamhaus.sh <IP>
+[output recortado]
 
+IMPACTO:
+[Correo rebotado/marcado como spam, reputación de dominio afectada, posible indicador de compromiso]
+
+REMEDIACIÓN:
+- Identificar y neutralizar la causa raíz (ver FASE 6)
+- Publicar/corregir SPF, DKIM, DMARC
+- Solicitar delisting en cada RBL afectada
+- Monitorización periódica de reputación
+
+REFERENCIAS:
+- https://github.com/hackingyseguridad/listanegra
+- https://check.spamhaus.org/query/ip/[IP]
+```
+
+---
+
+## REFERENCIAS
+
+- Repositorio: https://github.com/hackingyseguridad/listanegra
+- Scripts: `consulta.sh` / `consulta2.sh` (triage rápido, CLI/fichero/stdin), `listanegra.sh` /
+  `listanegra2.sh` (auditoría completa ~190 RBL, IP única / lote), `spamhaus.sh` / `spamhaus2.sh`
+  (Spamhaus SBL/XBL/PBL/CSS por separado, IP única / lote)
+- Ficheros de datos: `ip.txt` (a crear), `listas.txt`, `dns.txt`, `LISTAS.md` (catálogo de RBL
+  categorizado), `resultado.txt` (salida compartida)
+- Spamhaus DNSBL: https://www.spamhaus.org/ — códigos de respuesta: https://www.spamhaus.org/faq/
+- www.hackingyseguridad.com
 
 
