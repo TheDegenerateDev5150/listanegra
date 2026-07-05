@@ -67,7 +67,7 @@ por ejemplo.:  https://check.spamhaus.org/query/ip/80.58.71.71
 
 ### -
 
-| **URL** | **Descripción ** |
+| URL | Descripción |
 | :--- | :--- |
 | https://check.spamhaus.org/query/ip/ | **Verificador de Spamhaus**. Consulta el estado de una IP en sus listas (SBL, XBL, PBL, CSS). |
 | https://multirbl.valli.org/lookup/$IP.html | **Verificador múltiple**. Comprueba una IP en más de 120 listas RBL/DNSBL diferentes. |
