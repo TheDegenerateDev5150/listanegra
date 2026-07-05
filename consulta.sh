@@ -1,16 +1,29 @@
 #!/bin/sh
+
 # ============================================================================
 # consulta.sh v1.0.0 (Compatible con Bash 1.0.x)
 # Script de consulta de IPs en listas negras (BlackList) mediante DNS
 #
 # Uso:
-#   ./consulta_blacklist.sh <IP1> [IP2] [IP3] ...
-#   ./consulta_blacklist.sh -f <fichero_con_ips>
-#   cat lista_ips.txt | ./consulta.sh 
-# 
+#
+#   ./consulta.sh <IP1> [IP2] [IP3] ...
+#   ./consulta.sh -f <fichero_con_ips>
+#   cat ip.txt | ./consulta.sh
+#
 # usa consultas del tipo dig +short 99.255.41.81.spamhaus.org
-# Autor: hackingyseguridad.com
-# ============================================================================
+# -----------------------------------------------------------------------------------------
+# solo consulta a estas Listas , que serian la mas importantes ahora mismo
+# -----------------------------------------------------------------------------------------
+# zen.spamhaus.org - Spamhaus ZEN (la combinación más común de sus listas SBL, XBL y PBL)
+# b.barracudacentral.org - Barracuda Reputation Block List (BRBL)
+# bl.spamcop.net - SpamCop Blocking List (SCBL)
+# dyna.spamrats.com - SpamRATS (lista para IPs dinámicas y residenciales)
+# noptr.spamrats.com - SpamRATS (lista para IPs sin registro PTR válido)
+# spam.spamrats.com - SpamRATS (lista general de spam)
+# dnsbl.sorbs.net - SORBS (Spam and Open Relay Blocking System)
+# -------------------------------------------------------------------------------------------
+# Autor: @antonio_taboada  / hackingyseguridad.com
+# ============================================================================================
 
 VERSION="1.0.0"
 FICHERO_RESULTADO="resultado.txt"
@@ -89,7 +102,7 @@ validar_ip() {
 consultar_dns() {
   local ip="$1"
   local invertida=`echo "$ip" | awk -F. '{print $4"."$3"."$2"."$1}'`
-  local listas="zen.spamhaus.org bl.spamcop.net cbl.anti-spam.org.cn"
+  local listas="zen.spamhaus.org b.barracudacentral.org bl.spamcop.net dyna.spamrats.com noptr.spamrats.com spam.spamrats.com dnsbl.sorbs.net"
   local encontrada=0
   local listas_activas=""
 
