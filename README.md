@@ -1,3 +1,6 @@
+
+
+
 <img align="left" alt="Listas Negras IP - hackingyseguridad.com" src="https://github.com/hackingyseguridad/listanegra/blob/main/blacklist.png" style="margin-bottom: 20px;">
 
 ## Listanegra
@@ -58,15 +61,13 @@ Aparecer en el Top de los Peores (Top 10 Worst ASNs): Organizaciones como Spamha
 
 ### Consulta manual IP o dominio en lista negra ( blacklist )
 
-Por ejemplo.:  https://check.spamhaus.org/query/ip/80.58.71.71
+por ejemplo.:  https://check.spamhaus.org/query/ip/80.58.71.71
 
 <img align="left" alt="Listas Negras IP https://check.spamhaus.org/query/ip/" src="https://github.com/hackingyseguridad/listanegra/blob/main/spamhaus.png" style="margin-bottom: 20px;">
 
-#
+### -
 
-#
-
-| **URL** | **Descripción breve** |
+| **URL** | **Descripción ** |
 | :--- | :--- |
 | https://check.spamhaus.org/query/ip/ | **Verificador de Spamhaus**. Consulta el estado de una IP en sus listas (SBL, XBL, PBL, CSS). |
 | https://multirbl.valli.org/lookup/$IP.html | **Verificador múltiple**. Comprueba una IP en más de 120 listas RBL/DNSBL diferentes. |
@@ -171,9 +172,6 @@ chmod +x *.sh
 http://www.hackingyseguridad.com/
 
 #
-
-
-
 
 
 
