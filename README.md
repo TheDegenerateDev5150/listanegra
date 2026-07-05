@@ -62,11 +62,11 @@ Por ejemplo.:  https://check.spamhaus.org/query/ip/80.58.71.71
 
 <img align="left" alt="Listas Negras IP https://check.spamhaus.org/query/ip/" src="https://github.com/hackingyseguridad/listanegra/blob/main/spamhaus.png" style="margin-bottom: 20px;">
 
-###
+#
 
 | **URL** | **Descripción breve** |
 | :--- | :--- |
-| https://check.spamhaus.org/query/ip/ | **Verificador oficial de Spamhaus**. Consulta el estado de una IP en sus listas (SBL, XBL, PBL, CSS). |
+| https://check.spamhaus.org/query/ip/ | **Verificador de Spamhaus**. Consulta el estado de una IP en sus listas (SBL, XBL, PBL, CSS). |
 | https://multirbl.valli.org/lookup/$IP.html | **Verificador múltiple**. Comprueba una IP en más de 120 listas RBL/DNSBL diferentes. |
 | https://whatismyipaddress.com/blacklist-check | **Herramienta de verificación**. Consulta el estado de tu IP en unas 50 bases de datos antispam. |
 | https://blacklistalert.org/ | **Servicio de monitorización**. Permite verificar IPs/dominios y recibir alertas sobre listados. |
