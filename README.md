@@ -64,6 +64,8 @@ Por ejemplo.:  https://check.spamhaus.org/query/ip/80.58.71.71
 
 #
 
+#
+
 | **URL** | **Descripción breve** |
 | :--- | :--- |
 | https://check.spamhaus.org/query/ip/ | **Verificador de Spamhaus**. Consulta el estado de una IP en sus listas (SBL, XBL, PBL, CSS). |
@@ -73,7 +75,7 @@ Por ejemplo.:  https://check.spamhaus.org/query/ip/80.58.71.71
 | https://www.dnsbl.info/ | **Buscador de DNSBL**. Consulta el estado de una IP en más de 100 listas negras basadas en DNS. |
 | https://mxtoolbox.com/ | **Conjunto de herramientas de red**. Incluye un verificador que chequea IPs contra 105 listas DNSBL. |
 | https://www.abuseipdb.com/ | **Base de datos colaborativa**. Permite consultar y reportar IPs que han realizado actividades maliciosas. |
-| https://www.abuseat.org/ | **Sitio web oficial de la CBL (Composite Blocking List)**. Informativo sobre esta lista negra específica. |
+| https://www.abuseat.org/ | **CBL (Composite Blocking List)**. Informativo sobre esta lista negra específica. |
 
 ## Instalar Git
 
