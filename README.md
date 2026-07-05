@@ -58,27 +58,21 @@ Aparecer en el Top de los Peores (Top 10 Worst ASNs): Organizaciones como Spamha
 
 ### Consulta manual IP o dominio en lista negra ( blacklist )
 
-https://check.spamhaus.org/query/ip/<IP>
+Por ejemplo.:  https://check.spamhaus.org/query/ip/<IP>
 
 <img align="left" alt="Listas Negras IP https://check.spamhaus.org/query/ip/" src="https://github.com/hackingyseguridad/listanegra/blob/main/spamhaus.png" style="margin-bottom: 20px;">
 
-https://www.abuseat.org/
 
-https://www.abuseipdb.com/
-
-https://otx.alienvault.com/
-
-https://www.shodan.io/
-
-https://whatismyipaddress.com/blacklist-check
-
-https://blacklistalert.org/
-
-https://www.dnsbl.info/
-
-https://mxtoolbox.com/
-
-https://multirbl.valli.org/lookup/$IP.html
+| **URL** | **Descripción breve** |
+| :--- | :--- |
+| https://check.spamhaus.org/query/ip/ | **Verificador oficial de Spamhaus**. Consulta el estado de una IP en sus listas (SBL, XBL, PBL, CSS). |
+| https://multirbl.valli.org/lookup/$IP.html | **Verificador múltiple**. Comprueba una IP en más de 120 listas RBL/DNSBL diferentes. |
+| https://whatismyipaddress.com/blacklist-check | **Herramienta de verificación**. Consulta el estado de tu IP en unas 50 bases de datos antispam. |
+| https://blacklistalert.org/ | **Servicio de monitorización**. Permite verificar IPs/dominios y recibir alertas sobre listados. |
+| https://www.dnsbl.info/ | **Buscador de DNSBL**. Consulta el estado de una IP en más de 100 listas negras basadas en DNS. |
+| https://mxtoolbox.com/ | **Conjunto de herramientas de red**. Incluye un verificador que chequea IPs contra 105 listas DNSBL. |
+| https://www.abuseipdb.com/ | **Base de datos colaborativa**. Permite consultar y reportar IPs que han realizado actividades maliciosas. |
+| https://www.abuseat.org/ | **Sitio web oficial de la CBL (Composite Blocking List)**. Informativo sobre esta lista negra específica. |
 
 ## Instalar Git
 
