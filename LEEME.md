@@ -63,7 +63,7 @@ por ejemplo.:  https://check.spamhaus.org/query/ip/80.58.71.71
 
 <img align="left" alt="Listas Negras IP https://check.spamhaus.org/query/ip/" src="https://github.com/hackingyseguridad/listanegra/blob/main/spamhaus.png" style="margin-bottom: 20px;">
 
-### Tabla con algunos sitios para consulta manual:
+### -
 
 | **URL** | **Descripción ** |
 | :--- | :--- |
