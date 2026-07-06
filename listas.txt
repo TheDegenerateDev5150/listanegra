@@ -45,7 +45,6 @@ combined.abuse.ch
 combined.njabl.org
 combined.rbl.msrbl.net
 csi.cloudmark.com
-db.wpbl.info
 dnsbl-0.uceprotect.net
 dnsbl-1.uceprotect.net
 dnsbl-2.uceprotect.net
