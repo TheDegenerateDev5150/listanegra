@@ -41,7 +41,6 @@ bogons.cymru.com
 bsb.empty.us
 bsb.spamlookup.net
 cbl.abuseat.org
-cdl.anti-spam.org.cn
 combined.abuse.ch
 combined.njabl.org
 combined.rbl.msrbl.net
