@@ -57,7 +57,7 @@ Las listas negras más estrictas a nivel de red (como UCEPROTECT Nivel 3 o los s
 
 **20% de sus IPs activas listadas:** Si una de cada cinco IPs de un proveedor está listada, los filtros consideran que el AS está ***"fuera de control"***.
 
-Aparecer en el top de los peores (Top 10 Worst ASNs): Organizaciones como Spamhaus publican diariamente una lista de los  **10 AS Sistemas Autónomos** con peor comportamiento del mundo. Si un ISP entra ahí, cientos de miles de servidores de correo en todo el planeta activan automáticamente una regla de bloqueo preventivo de todo su rango.   (Como solicitar deslistasr con Spamhaus: )[https://github.com/hackingyseguridad/listanegra/blob/main/SPAMHAUS.md]
+Aparecer en el top de los peores (Top 10 Worst ASNs): Organizaciones como Spamhaus publican diariamente una lista de los  **10 AS Sistemas Autónomos** con peor comportamiento del mundo. Si un ISP entra ahí, cientos de miles de servidores de correo en todo el planeta activan automáticamente una regla de bloqueo preventivo de todo su rango.   [Como solicitar deslistasr con Spamhaus: ](https://github.com/hackingyseguridad/listanegra/blob/main/SPAMHAUS.md)
 
 ### Consulta manual IP o dominio en lista negra ( blacklist )
 
