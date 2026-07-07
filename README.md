@@ -63,7 +63,7 @@ Aparecer en el top de los peores (Top 10 Worst ASNs): Organizaciones como Spamha
 
 por ejemplo.:  https://check.spamhaus.org/query/ip/80.58.71.71
 
-<img align="left" alt="Listas Negras IP https://check.spamhaus.org/query/ip/" src="https://github.com/hackingyseguridad/listanegra/blob/main/spamhaus.png" style="margin-bottom: 20px;">
+<img style="float:left"  alt="Listas Negras IP https://check.spamhaus.org/query/ip/" src="https://github.com/hackingyseguridad/listanegra/blob/main/spamhaus.png" style="margin-bottom: 20px;">
 
 ### -
 
