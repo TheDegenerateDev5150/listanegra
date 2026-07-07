@@ -29,7 +29,6 @@ eswlrev.dnsbl.rediris.es
 exitnodes.tor.dnsbl.sectoor.de
 feb.spamlab.com
 forbidden.icm.edu.pl
-hil.habeas.com
 hostkarma.junkemailfilter.com
 httpbl.abuse.ch
 hul.habeas.com
