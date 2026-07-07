@@ -2,31 +2,23 @@
 
 # Script de consulta Spamhaus para Bash 1.0.x
 # Lee listas negras desde listas.txt
-# Formato de listas.txt: nombre_lista|dominio_lista|descripcion
-# Ejemplo: SBL|sbl.spamhaus.org|Spamhaus Blocklist
+# Lee IPs desde ip.txt
+# Uso: sh listanegra.sh
+# Ejemplo: sh listanegra.sh
 
 # Variables
-INPUT_IPS="ip.txt"
 INPUT_DNS="dns.txt"
 INPUT_LISTAS="listas.txt"
+INPUT_IPS="ip.txt"
 OUTPUT_FILE="resultado.txt"
 CACHE_FILE="/tmp/cache_spamhaus.txt"
 
-# Contadores
-TOTAL=0
-PROCESADAS=0
-LISTADAS=0
-LIMPIAS=0
-ERRORES=0
-TOTAL_DNS=0
+# Contadores globales
+TOTAL_IPS=0
 TOTAL_LISTAS=0
-
-# Verificar que existe el archivo de IPs
-if [ ! -f "$INPUT_IPS" ]; then
-  echo "ERROR: No se encuentra el archivo $INPUT_IPS"
-  echo "Crea un archivo con una IP por línea"
-  exit 1
-fi
+TOTAL_LISTADAS=0
+TOTAL_LIMPIAS=0
+TOTAL_ERRORES=0
 
 # Verificar que existe el archivo de DNS
 if [ ! -f "$INPUT_DNS" ]; then
@@ -40,6 +32,16 @@ if [ ! -f "$INPUT_LISTAS" ]; then
   echo "ERROR: No se encuentra el archivo $INPUT_LISTAS"
   echo "Crea un archivo con el formato: nombre|dominio|descripcion"
   echo "Ejemplo: SBL|sbl.spamhaus.org|Spamhaus Blocklist"
+  exit 1
+fi
+
+# Verificar que existe el archivo de IPs
+if [ ! -f "$INPUT_IPS" ]; then
+  echo "ERROR: No se encuentra el archivo $INPUT_IPS"
+  echo "Crea un archivo con una IP por línea"
+  echo "Ejemplo:"
+  echo "  1.1.1.1"
+  echo "  8.8.8.8"
   exit 1
 fi
 
@@ -59,12 +61,6 @@ if [ "x$TOTAL_DNS" = "x" ] || [ $TOTAL_DNS -eq 0 ]; then
   exit 1
 fi
 
-# Contar total de IPs (ignorando vacías)
-TOTAL=`grep -v '^$' "$INPUT_IPS" | wc -l`
-if [ "x$TOTAL" = "x" ]; then
-  TOTAL=0
-fi
-
 # Contar total de listas
 TOTAL_LISTAS=`grep -v '^$' "$INPUT_LISTAS" | wc -l`
 if [ "x$TOTAL_LISTAS" = "x" ] || [ $TOTAL_LISTAS -eq 0 ]; then
@@ -72,16 +68,23 @@ if [ "x$TOTAL_LISTAS" = "x" ] || [ $TOTAL_LISTAS -eq 0 ]; then
   exit 1
 fi
 
+# Contar total de IPs
+TOTAL_IPS=`grep -v '^$' "$INPUT_IPS" | wc -l`
+if [ "x$TOTAL_IPS" = "x" ] || [ $TOTAL_IPS -eq 0 ]; then
+  echo "ERROR: No hay IPs definidas en $INPUT_IPS"
+  exit 1
+fi
+
 # Cabecera en pantalla y archivo
 echo "============================================================"
 echo "   SCRIPT DE CONSULTA SPAMHAUS (Bash 1.0.x)"
-echo "   Consulta múltiples listas negras desde listas.txt"
+echo "   Consulta múltiples IPs contra listas negras"
 echo "============================================================"
-echo "Archivo de IPs:    $INPUT_IPS"
 echo "Archivo de DNS:    $INPUT_DNS"
 echo "Archivo de listas: $INPUT_LISTAS"
+echo "Archivo de IPs:    $INPUT_IPS"
 echo "Archivo de salida: $OUTPUT_FILE"
-echo "Total de IPs a procesar: $TOTAL"
+echo "Total de IPs a consultar: $TOTAL_IPS"
 echo "Total de listas a consultar: $TOTAL_LISTAS"
 echo "============================================================"
 echo ""
@@ -94,10 +97,18 @@ done
 echo "============================================================"
 echo ""
 
+# Mostrar IPs a consultar
+echo "IPs a consultar:"
+grep -v '^$' "$INPUT_IPS" | while read IP; do
+  echo "  - $IP"
+done
+echo "============================================================"
+echo ""
+
 # Escribir cabecera en el archivo de resultados
 echo "============================================================" >> "$OUTPUT_FILE"
 echo "   SCRIPT DE CONSULTA SPAMHAUS (Bash 1.0.x)" >> "$OUTPUT_FILE"
-echo "   Consulta múltiples listas negras desde listas.txt" >> "$OUTPUT_FILE"
+echo "   Consulta múltiples IPs contra listas negras" >> "$OUTPUT_FILE"
 echo "   Fecha: `date`" >> "$OUTPUT_FILE"
 echo "============================================================" >> "$OUTPUT_FILE"
 echo "" >> "$OUTPUT_FILE"
@@ -109,49 +120,64 @@ grep -v '^$' "$INPUT_LISTAS" | while IFS='|' read NOMBRE DOMINIO DESCRIPCION; do
 done
 echo "" >> "$OUTPUT_FILE"
 
+# Escribir IPs consultadas en el archivo
+echo "IPs consultadas:" >> "$OUTPUT_FILE"
+grep -v '^$' "$INPUT_IPS" | while read IP; do
+  echo "  - $IP" >> "$OUTPUT_FILE"
+done
+echo "" >> "$OUTPUT_FILE"
+echo "============================================================" >> "$OUTPUT_FILE"
+echo "" >> "$OUTPUT_FILE"
+
 # Cargar servidores DNS en un archivo temporal
 TEMP_DNS="/tmp/dns_list_$$.txt"
 grep -v '^$' "$INPUT_DNS" > "$TEMP_DNS"
-TOTAL_DNS=`wc -l < "$TEMP_DNS"`
 
 # Cargar listas en un archivo temporal
 TEMP_LISTAS="/tmp/listas_$$.txt"
 grep -v '^$' "$INPUT_LISTAS" > "$TEMP_LISTAS"
-TOTAL_LISTAS=`wc -l < "$TEMP_LISTAS"`
 
-# Procesar archivo de IPs línea por línea
-exec 3< "$INPUT_IPS"
-while read -r IP <&3; do
-  # Saltar líneas vacías
-  if [ "x$IP" = "x" ]; then
+# Cargar IPs en un archivo temporal
+TEMP_IPS="/tmp/ips_$$.txt"
+grep -v '^$' "$INPUT_IPS" > "$TEMP_IPS"
+
+# Seleccionar servidor DNS (usamos el primero para consistencia)
+DNS_SERVER=`head -1 "$TEMP_DNS"`
+
+# Variable para el contador de IPs procesadas
+IP_INDEX=1
+
+# Procesar cada IP del archivo
+while [ $IP_INDEX -le $TOTAL_IPS ]; do
+  IP=`sed -n "${IP_INDEX}p" "$TEMP_IPS"`
+  
+  # Validar formato de IP (básico)
+  VALIDAR_IP=`echo "$IP" | grep -E '^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$'`
+  if [ "x$VALIDAR_IP" = "x" ]; then
+    echo "ERROR: IP no válida: $IP (saltando...)"
+    echo "ERROR: IP no válida: $IP (saltando...)" >> "$OUTPUT_FILE"
+    IP_INDEX=`expr $IP_INDEX + 1`
     continue
   fi
 
-  PROCESADAS=`expr $PROCESADAS + 1`
+  echo ""
+  echo "============================================================"
+  echo "[$IP_INDEX/$TOTAL_IPS] Procesando IP: $IP"
+  echo "============================================================"
+  echo ""
 
-  # Mostrar progreso en pantalla
-  echo "[$PROCESADAS/$TOTAL] Consultando IP: $IP ..."
+  # Escribir IP en el archivo de resultados
+  echo "============================================================" >> "$OUTPUT_FILE"
+  echo "IP: $IP" >> "$OUTPUT_FILE"
+  echo "============================================================" >> "$OUTPUT_FILE"
 
   # Invertir la IP para DNSBL
   REV=`echo "$IP" | awk -F "." '{print $4"."$3"."$2"."$1}'`
 
-  # Seleccionar servidor DNS de forma rotativa
-  MOD=`expr $PROCESADAS % $TOTAL_DNS`
-  if [ $MOD -eq 0 ]; then
-    MOD=$TOTAL_DNS
-  fi
-
-  # Obtener el DNS correspondiente al índice
-  DNS_SERVER=`sed -n "${MOD}p" "$TEMP_DNS"`
-
-  # Si no se pudo obtener, usar el primero
-  if [ "x$DNS_SERVER" = "x" ]; then
-    DNS_SERVER=`head -1 "$TEMP_DNS"`
-  fi
-
-  # Variable para saber si la IP está listada
+  # Variables para almacenar resultados de todas las listas
+  LISTAS_POSITIVAS=""
   ENCONTRADA=0
-  MENSAJE_RESULTADO=""
+  LISTADAS_IP=0
 
   # Iterar sobre cada lista
   LISTA_INDEX=1
@@ -165,21 +191,29 @@ while read -r IP <&3; do
     
     # Verificar que tenemos todos los campos
     if [ "x$NOMBRE_LISTA" != "x" ] && [ "x$DOMINIO_LISTA" != "x" ]; then
+      echo "  Consultando $NOMBRE_LISTA ($DOMINIO_LISTA) ..."
+      
       # Consultar la lista
       RESULTADO=`dig +short "@$DNS_SERVER" "${REV}.${DOMINIO_LISTA}" A 2>/dev/null | head -1`
       
       if [ ! -z "$RESULTADO" ]; then
+        echo "    Respuesta: $RESULTADO"
+        
         # Verificar si es código de error
         ERROR_PREFIX=`echo "$RESULTADO" | awk -F "." '{print $1"."$2"."$3}'`
         if [ "$ERROR_PREFIX" != "127.255.255" ]; then
+          # Esta IP está listada en esta lista
           ENCONTRADA=1
-          MENSAJE_RESULTADO="LISTADA en: $NOMBRE_LISTA ($DOMINIO_LISTA)"
-          MENSAJE_RESULTADO="$MENSAJE_RESULTADO - Código: $RESULTADO"
+          LISTADAS_IP=`expr $LISTADAS_IP + 1`
+          MENSAJE_LISTA="  LISTADA: $NOMBRE_LISTA ($DOMINIO_LISTA) - Código: $RESULTADO"
           if [ "x$DESCRIPCION_LISTA" != "x" ]; then
-            MENSAJE_RESULTADO="$MENSAJE_RESULTADO - $DESCRIPCION_LISTA"
+            MENSAJE_LISTA="$MENSAJE_LISTA - $DESCRIPCION_LISTA"
           fi
-          break
+          LISTAS_POSITIVAS="$LISTAS_POSITIVAS\n$MENSAJE_LISTA"
+          TOTAL_LISTADAS=`expr $TOTAL_LISTADAS + 1`
         fi
+      else
+        echo "    Sin respuesta (no listada)"
       fi
     fi
     
@@ -187,13 +221,21 @@ while read -r IP <&3; do
   done
 
   # -----------------------------------------------------------------
-  # Mostrar resultado final
+  # Mostrar resultado final para esta IP
   # -----------------------------------------------------------------
+  echo ""
+  echo "============================================================"
   if [ $ENCONTRADA -eq 1 ]; then
-    LISTADAS=`expr $LISTADAS + 1`
-    echo "  $MENSAJE_RESULTADO"
-    echo "$MENSAJE_RESULTADO" >> "$OUTPUT_FILE"
-    echo "LISTED $IP -> $MENSAJE_RESULTADO" >> "$CACHE_FILE"
+    echo "RESULTADO: IP LISTADA EN $LISTADAS_IP LISTA(S) NEGRA(S)"
+    echo "IP: $IP"
+    echo "Listas donde aparece:"
+    echo -e "$LISTAS_POSITIVAS" | while read LINEA; do
+      if [ ! -z "$LINEA" ]; then
+        echo "$LINEA"
+        echo "$LINEA" >> "$OUTPUT_FILE"
+      fi
+    done
+    echo "LISTED $IP -> $LISTADAS_IP lista(s)" >> "$CACHE_FILE"
   else
     # Verificar si hubo errores en las consultas
     HUBO_ERROR=0
@@ -221,42 +263,40 @@ while read -r IP <&3; do
     done
 
     if [ $HUBO_ERROR -eq 1 ]; then
-      ERRORES=`expr $ERRORES + 1`
-      echo "  $MENSAJE_ERROR"
+      TOTAL_ERRORES=`expr $TOTAL_ERRORES + 1`
+      echo "RESULTADO: $MENSAJE_ERROR"
       echo "$MENSAJE_ERROR" >> "$OUTPUT_FILE"
       echo "ERROR $IP -> $MENSAJE_ERROR" >> "$CACHE_FILE"
     else
-      LIMPIAS=`expr $LIMPIAS + 1`
+      TOTAL_LIMPIAS=`expr $TOTAL_LIMPIAS + 1`
       MENSAJE="LIMPI  : $IP -> No listada en ninguna lista negra"
-      echo "  $MENSAJE"
+      echo "RESULTADO: $MENSAJE"
       echo "$MENSAJE" >> "$OUTPUT_FILE"
       echo "CLEAN $IP" >> "$CACHE_FILE"
     fi
   fi
+  echo "============================================================"
+  echo ""
 
-  # Mostrar progreso cada 10 IPs
-  MOD_PROGRESS=`expr $PROCESADAS % 10`
-  if [ $MOD_PROGRESS -eq 0 ]; then
-    echo "  [Progreso: $PROCESADAS/$TOTAL - Listadas: $LISTADAS, Limpias: $LIMPIAS, Errores: $ERRORES]"
-  fi
-
+  # Escribir separador en el archivo de resultados
+  echo "" >> "$OUTPUT_FILE"
+  
+  IP_INDEX=`expr $IP_INDEX + 1`
 done
 
-# Cerrar descriptor de archivo
-exec 3<&-
-
 # Limpiar archivos temporales
-rm -f "$TEMP_DNS" "$TEMP_LISTAS"
+rm -f "$TEMP_DNS" "$TEMP_LISTAS" "$TEMP_IPS"
 
 # Mostrar resumen final en pantalla
 echo ""
 echo "============================================================"
-echo "   RESUMEN FINAL"
+echo "   RESUMEN FINAL GLOBAL"
 echo "============================================================"
-echo "Total de IPs procesadas: $PROCESADAS"
-echo "IPs LISTADAS (en negra): $LISTADAS"
-echo "IPs LIMPIAS (no listadas): $LIMPIAS"
-echo "IPs con ERROR en consulta: $ERRORES"
+echo "Total de IPs procesadas: $TOTAL_IPS"
+echo "Total de listas consultadas por IP: $TOTAL_LISTAS"
+echo "Total de LISTADAS (en listas negras): $TOTAL_LISTADAS"
+echo "Total de IPs LIMPIAS (no listadas): $TOTAL_LIMPIAS"
+echo "Total de IPs con ERROR en consulta: $TOTAL_ERRORES"
 echo "============================================================"
 echo ""
 echo "Resultados guardados en: $OUTPUT_FILE"
@@ -264,11 +304,12 @@ echo "Resultados guardados en: $OUTPUT_FILE"
 # Escribir resumen en el archivo de resultados
 echo "" >> "$OUTPUT_FILE"
 echo "============================================================" >> "$OUTPUT_FILE"
-echo "   RESUMEN FINAL" >> "$OUTPUT_FILE"
+echo "   RESUMEN FINAL GLOBAL" >> "$OUTPUT_FILE"
 echo "============================================================" >> "$OUTPUT_FILE"
-echo "Total de IPs procesadas: $PROCESADAS" >> "$OUTPUT_FILE"
-echo "IPs LISTADAS (en negra): $LISTADAS" >> "$OUTPUT_FILE"
-echo "IPs LIMPIAS (no listadas): $LIMPIAS" >> "$OUTPUT_FILE"
-echo "IPs con ERROR en consulta: $ERRORES" >> "$OUTPUT_FILE"
+echo "Total de IPs procesadas: $TOTAL_IPS" >> "$OUTPUT_FILE"
+echo "Total de listas consultadas por IP: $TOTAL_LISTAS" >> "$OUTPUT_FILE"
+echo "Total de LISTADAS (en listas negras): $TOTAL_LISTADAS" >> "$OUTPUT_FILE"
+echo "Total de IPs LIMPIAS (no listadas): $TOTAL_LIMPIAS" >> "$OUTPUT_FILE"
+echo "Total de IPs con ERROR en consulta: $TOTAL_ERRORES" >> "$OUTPUT_FILE"
 echo "============================================================" >> "$OUTPUT_FILE"
 echo "Fecha de finalización: `date`" >> "$OUTPUT_FILE"
