@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Script de consulta Spamhaus para Bash 1.0.x
+# @antonio_taboada  / hackingyseguridad.com
 # Lee listas negras desde listas.txt
 # Uso: sh listanegra.sh [IP]
 # Ejemplo: sh listanegra.sh 1.1.1.1
