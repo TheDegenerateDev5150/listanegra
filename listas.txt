@@ -203,3 +203,6 @@ work.drbl.gremlin.ru
 xbl.spamhaus.org
 z.mailspike.net
 zen.spamhaus.org
+dnsbl-1.uceprotect.net
+dnsbl-2.uceprotect.net
+dnsbl-3.uceprotect.net
