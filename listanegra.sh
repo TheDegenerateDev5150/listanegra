@@ -136,11 +136,11 @@ REV=`echo "$IP" | awk -F "." '{print $4"."$3"."$2"."$1}'`
 # Seleccionar servidor DNS (usamos el primero para consistencia)
 DNS_SERVER=`head -1 "$TEMP_DNS"`
 
-# Variable para saber si la IP está listada
+# Variables para almacenar resultados de todas las listas
+LISTAS_POSITIVAS=""
 ENCONTRADA=0
-MENSAJE_RESULTADO=""
 
-# Iterar sobre cada lista
+# Iterar sobre cada lista (TODAS las listas, no solo la primera)
 LISTA_INDEX=1
 while [ $LISTA_INDEX -le $TOTAL_LISTAS ]; do
   LINEA_LISTA=`sed -n "${LISTA_INDEX}p" "$TEMP_LISTAS"`
@@ -163,13 +163,14 @@ while [ $LISTA_INDEX -le $TOTAL_LISTAS ]; do
       # Verificar si es código de error
       ERROR_PREFIX=`echo "$RESULTADO" | awk -F "." '{print $1"."$2"."$3}'`
       if [ "$ERROR_PREFIX" != "127.255.255" ]; then
+        # Esta IP está listada en esta lista
         ENCONTRADA=1
-        MENSAJE_RESULTADO="LISTADA en: $NOMBRE_LISTA ($DOMINIO_LISTA)"
-        MENSAJE_RESULTADO="$MENSAJE_RESULTADO - Código: $RESULTADO"
+        MENSAJE_LISTA="LISTADA: $NOMBRE_LISTA ($DOMINIO_LISTA) - Código: $RESULTADO"
         if [ "x$DESCRIPCION_LISTA" != "x" ]; then
-          MENSAJE_RESULTADO="$MENSAJE_RESULTADO - $DESCRIPCION_LISTA"
+          MENSAJE_LISTA="$MENSAJE_LISTA - $DESCRIPCION_LISTA"
         fi
-        break
+        LISTAS_POSITIVAS="$LISTAS_POSITIVAS\n  $MENSAJE_LISTA"
+        LISTADAS=`expr $LISTADAS + 1`
       fi
     else
       echo "    Sin respuesta (no listada)"
@@ -180,15 +181,21 @@ while [ $LISTA_INDEX -le $TOTAL_LISTAS ]; do
 done
 
 # -----------------------------------------------------------------
-# Mostrar resultado final
+# Mostrar resultado final (SOLO las listas donde está listada)
 # -----------------------------------------------------------------
 echo ""
 echo "============================================================"
 if [ $ENCONTRADA -eq 1 ]; then
-  LISTADAS=`expr $LISTADAS + 1`
-  echo "RESULTADO: $MENSAJE_RESULTADO"
-  echo "$MENSAJE_RESULTADO" >> "$OUTPUT_FILE"
-  echo "LISTED $IP -> $MENSAJE_RESULTADO" >> "$CACHE_FILE"
+  echo "RESULTADO: IP LISTADA EN LISTAS NEGRAS"
+  echo "IP: $IP"
+  echo "Listas donde aparece:"
+  echo -e "$LISTAS_POSITIVAS" | while read LINEA; do
+    if [ ! -z "$LINEA" ]; then
+      echo "$LINEA"
+      echo "$LINEA" >> "$OUTPUT_FILE"
+    fi
+  done
+  echo "LISTED $IP -> $LISTAS_POSITIVAS" >> "$CACHE_FILE"
 else
   # Verificar si hubo errores en las consultas
   HUBO_ERROR=0
