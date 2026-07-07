@@ -53,7 +53,7 @@ de SPAM).
 **barracudacentral.org** Es el sistema de reputación de Barracuda Networks, uno de los firewalls de 
 email más vendidos del mundo.
 
-``
+---
 
 Las listas DNSBL tradicionales, como zen.spamhaus.org, funcionan a nivel de IP individual. Sin embargo, el bloqueo a nivel de ASN (Autonomous System Number) o de rango CIDR es una funcionalidad que ofrecen servicios de seguridad más avanzados, como AWS WAF o cortafuegos especializados.
 
@@ -65,7 +65,8 @@ Cortafuegos y otros dispositivos: La mayoría de los firewalls y sistemas de pre
 
 El bloqueo de rangos y ASNs es una función que ofrecen las plataformas de seguridad por derecho propio, no directamente el DNSBL, pero se puede combinar con la información de las listas para crear estrategias de defensa más amplias y robustas.
 
-``
+---
+
 ### El umbral crítico: 20 % de IP Listadas de un AS (BGP sistema autonomo)
 
 Las listas negras más estrictas a nivel de red (como UCEPROTECT Nivel 3 o los sistemas de reputación de Spamhaus) automatizan el bloqueo de un AS completo bajo estas condiciones:
