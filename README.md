@@ -51,6 +51,18 @@ de SPAM).
 **barracudacentral.org** Es el sistema de reputación de Barracuda Networks, uno de los firewalls de 
 email más vendidos del mundo.
 
+
+
+Las listas DNSBL tradicionales, como zen.spamhaus.org, funcionan a nivel de IP individual. Sin embargo, el bloqueo a nivel de ASN (Autonomous System Number) o de rango CIDR es una funcionalidad que ofrecen servicios de seguridad más avanzados, como AWS WAF o cortafuegos especializados.
+
+AWS WAF: Permite crear reglas basadas en ASNs para bloquear o permitir todo el tráfico de un proveedor de servicios o una organización entera . Esto es mucho más eficiente que gestionar listas de IPs individuales, ya que los ASNs cambian con menos frecuencia .
+
+WatchGuard XCS: Utiliza reglas de conexión que pueden bloquear clientes basados en su presencia en una o múltiples listas DNSBL, y también incluye reglas para identificación por nombre de dominio o patrones de tráfico .
+
+Cortafuegos y otros dispositivos: La mayoría de los firewalls y sistemas de prevención de intrusiones pueden crear reglas para bloquear rangos de direcciones IP (CIDR) o países enteros, basándose en información que no proviene directamente de las listas DNSBL de spam.
+
+El bloqueo de rangos y ASNs es una función que ofrecen las plataformas de seguridad por derecho propio, no directamente el DNSBL, pero se puede combinar con la información de las listas para crear estrategias de defensa más amplias y robustas.
+
 ### El umbral crítico: 20 % de IP Listadas de un AS (BGP sistema autonomo)
 
 Las listas negras más estrictas a nivel de red (como UCEPROTECT Nivel 3 o los sistemas de reputación de Spamhaus) automatizan el bloqueo de un AS completo bajo estas condiciones:
