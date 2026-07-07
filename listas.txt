@@ -84,7 +84,6 @@ spam.spamrats.com
 spamguard.leadmon.net
 spamlist.or.kr
 spamsources.fabel.dk
-srn.surgate.net
 st.technovision.dk
 tor.dnsbl.sectoor.de
 tor.efnet.org
