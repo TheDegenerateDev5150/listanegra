@@ -19,7 +19,7 @@
 
 5º.- Proxy abiertos	Proxies HTTP/SOCKS comprometidos.
 
-**Actividades por las que podria ser resportada, sancionada, la IP e incluida en listas negras BlackList IP: ** Spam, fuerza bruta, DDoS Attack, DNS Compromise, web malicioso con malware, envenenamiento de DNS, host explotado, fraude en VoIP, Fuerza bruta sobre FTP, Hacking Hackeo (o Intrusión informática), ataque dirigido a IoT (Internet de las Cosas), Open Proxy, Phishing, ping de la muerte, escaneo de puertos, Inyección SQL, SSH (ataque sobre el protocolo SSH), Spoofing Suplantación (o falsificación), IP de VPN, Ataque a aplicación web, Spam web,..
+**actividades por las que podria ser resportada / sancionada la IP e incluida en listas negras (BlackList IP):** SPAM, fuerza bruta, DDoS attack, DNS compromise, web malicioso con malware, envenenamiento de DNS, host explotado, fraude en VoIP, fuerza bruta sobre FTP, Hacking Hackeo (o Intrusión informática), ataque dirigido a IoT (internet de las cosas), Open Proxy, Phishing, ping de la muerte, escaneo de puertos, Inyección SQL, SSH (ataque sobre el protocolo SSH), Spoofing Suplantación (o falsificación), IP de VPN, Ataque a aplicación web, Spam web,..
 
 ###  Impacto IP listada:
 
