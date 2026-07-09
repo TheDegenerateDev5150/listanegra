@@ -19,7 +19,7 @@
 
 5º.- Proxy abiertos	Proxies HTTP/SOCKS comprometidos.
 
-**actividades consideradas  maliciosas por las que podria ser reportada / sancionada la IP e incluida en listas negras (BlackList IP):** SPAM, fuerza bruta, DDoS attack, DNS compromise, web malicioso con malware, envenenamiento de DNS, host explotado, fraude en VoIP, fuerza bruta sobre FTP, Hacking Hackeo (o Intrusión informática), ataque dirigido a IoT (internet de las cosas), Open Proxy, Phishing, ping de la muerte, escaneo de puertos, Inyección SQL, SSH (ataque sobre el protocolo SSH), Spoofing Suplantación (o falsificación), IP de VPN, Ataque a aplicación web, Spam web,..
+**actividades consideradas  maliciosas por las que podria ser reportada / sancionada la IP e incluida en listas negras (BlackList IP):** SPAM, ataques de fuerza bruta, DDoS attack, DNS compromise, web malicioso con malware, envenenamiento de DNS, host explotado, fraude en VoIP,  Hacking Hackeo (o Intrusión informática), ataque dirigido a IoT (internet de las cosas), Proxu malicioso Open Proxy, Phishing, ping de la muerte tamaño 65000, escaneo de puertos, Inyección SQL, SSH (ataque sobre el protocolo SSH), Spoofing Suplantación (o falsificación), ataque a aplicación Web, ..
 
 ###  Impacto IP listada:
 
